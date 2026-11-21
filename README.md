@@ -74,3 +74,33 @@ python3 -m backend.server
 - **Public Platform:** [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 - **Resident Desk:** [http://127.0.0.1:8000/resident](http://127.0.0.1:8000/resident)
 - **Manager Hub:** [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
+
+---
+
+## 🌐 Cloud Deployment (Render)
+
+This repository includes pre-configured deployment files (`render.yaml`, `start.sh`, `requirements.txt`, and `Dockerfile`):
+
+### Option 1: Automatic Blueprint (Recommended)
+1. Push your repository to GitHub.
+2. Go to [Render Dashboard](https://dashboard.render.com/) -> **New +** -> **Blueprint**.
+3. Connect your repository. Render will automatically detect `render.yaml` and configure:
+   - **Runtime:** Python 3
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `./start.sh`
+4. Click **Apply**. Your app will be live on a free `onrender.com` HTTPS URL within 1-2 minutes!
+
+### Option 2: Manual Web Service
+1. In Render, select **New +** -> **Web Service**.
+2. Select your repository.
+3. Configure settings:
+   - **Environment:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `./start.sh`
+4. Click **Create Web Service**.
+
+### Option 3: Docker
+```bash
+docker build -t ashro-living .
+docker run -p 8000:8000 ashro-living
+```
