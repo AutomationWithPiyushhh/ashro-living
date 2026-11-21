@@ -104,7 +104,7 @@
                     <a href="tel:9876543210" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">
                         Call for Directions
                     </a>
-                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal(1)">
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal('vastral')">
                         Visit Today
                     </button>
                 </div>
@@ -120,7 +120,7 @@
                     <a href="tel:9876543210" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">
                         Call for Directions
                     </a>
-                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal(2)">
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal('naroda')">
                         Visit Today
                     </button>
                 </div>
@@ -136,7 +136,7 @@
                     <a href="tel:9876543210" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">
                         Call for Directions
                     </a>
-                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal(3)">
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal('rabari')">
                         Visit Today
                     </button>
                 </div>
@@ -524,7 +524,7 @@
             <form onsubmit="handleVisitSubmit(event)">
                 <div class="form-group">
                     <label>Select PG Location in Amdavad *</label>
-                    <select id="visitPropertySelect" required>
+                    <select id="visitPropertySelect" required onchange="updateVisitRoomsDropdown()">
                         <!-- Populated dynamically -->
                     </select>
                 </div>
@@ -532,7 +532,7 @@
                 <div class="form-group">
                     <label>Room Sharing Preference</label>
                     <select id="visitRoomSelect">
-                        <option value="">Any Available Room</option>
+                        <option value="">Any Available Suite</option>
                     </select>
                 </div>
 

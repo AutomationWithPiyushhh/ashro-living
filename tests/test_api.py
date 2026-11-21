@@ -68,6 +68,10 @@ class TestAshroLivingCore(unittest.TestCase):
         updated = models.update_visit_status(new_visit['id'], "Completed")
         self.assertEqual(updated['status'], "Completed")
 
+        # Test notification dispatch synchronously
+        import backend.notifications as notifications
+        notifications.notify_admin_visit(new_visit, async_mode=False)
+
     def test_booking_creation_and_inventory(self):
         new_booking = models.create_booking({
             "room_id": 2, # Twin Comfort Suite

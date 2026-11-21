@@ -105,10 +105,17 @@ function updateVisitRoomsDropdown() {
     const selectedPropId = visitPropertySelect.value;
     const matchingRooms = state.rooms.filter(r => !selectedPropId || r.property_id == selectedPropId);
 
+    const prevVal = visitRoomSelect.value;
     visitRoomSelect.innerHTML = '<option value="">Any Available Suite</option>';
     matchingRooms.forEach(r => {
         visitRoomSelect.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type} — ${formatINR(r.price_monthly)}/mo)</option>`;
     });
+
+    if (prevVal && matchingRooms.some(r => r.id == prevVal)) {
+        visitRoomSelect.value = prevVal;
+    } else {
+        visitRoomSelect.value = "";
+    }
 }
 
 function renderRooms(rooms) {
@@ -308,7 +315,7 @@ async function openRoomDetails(roomId) {
                     <span style="font-size: 11px; color: var(--accent-cocoa);">Includes 3 Wholesome Meals, Fiber Internet & Daily Housekeeping</span>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn-secondary" onclick="closeModal('roomDetailsModal'); openVisitModal(${room.id})">Schedule Tour</button>
+                    <button class="btn-secondary" onclick="closeModal('roomDetailsModal'); openVisitModal(${room.property_id}, ${room.id})">Schedule Tour</button>
                     <button class="btn-primary" onclick="closeModal('roomDetailsModal'); openReserveModal(${room.id})">Reserve Suite &rarr;</button>
                 </div>
             </div>
@@ -436,19 +443,63 @@ async function handleAuthSubmit(e) {
 }
 
 // Visit Booking Modal
-function openVisitModal(roomId = null) {
+function openVisitModal(propertyIdOrIdentifier = null, roomId = null) {
     const modal = document.getElementById('visitModal');
     if (!modal) return;
+
+    let targetPropId = null;
+
+    if (propertyIdOrIdentifier !== null && propertyIdOrIdentifier !== undefined) {
+        // If directly a property ID
+        const byId = state.properties.find(p => p.id == propertyIdOrIdentifier);
+        if (byId) {
+            targetPropId = byId.id;
+        } else if (typeof propertyIdOrIdentifier === 'string') {
+            const lower = propertyIdOrIdentifier.toLowerCase();
+            const bySlugOrName = state.properties.find(p =>
+                (p.slug && p.slug.toLowerCase().includes(lower)) ||
+                (p.name && p.name.toLowerCase().includes(lower)) ||
+                (p.area && p.area.toLowerCase().includes(lower))
+            );
+            if (bySlugOrName) {
+                targetPropId = bySlugOrName.id;
+            }
+        }
+    }
 
     if (roomId) {
         const room = state.rooms.find(r => r.id == roomId);
         if (room) {
-            const propSelect = document.getElementById('visitPropertySelect');
-            if (propSelect) propSelect.value = room.property_id;
-            updateVisitRoomsDropdown();
-            const roomSelect = document.getElementById('visitRoomSelect');
-            if (roomSelect) roomSelect.value = room.id;
+            targetPropId = room.property_id;
         }
+    }
+
+    const propSelect = document.getElementById('visitPropertySelect');
+    if (propSelect) {
+        if (targetPropId) {
+            propSelect.value = targetPropId;
+        } else if (!propSelect.value && state.properties.length > 0) {
+            propSelect.value = state.properties[0].id;
+        }
+        updateVisitRoomsDropdown();
+    }
+
+    const roomSelect = document.getElementById('visitRoomSelect');
+    if (roomSelect) {
+        if (roomId) {
+            roomSelect.value = roomId;
+        } else {
+            // Default room sharing preference to Any Available Suite
+            roomSelect.value = "";
+        }
+    }
+
+    // Default visit date to tomorrow if blank
+    const dateInput = document.getElementById('visitDate');
+    if (dateInput && !dateInput.value) {
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        dateInput.value = d.toISOString().split('T')[0];
     }
 
     modal.classList.add('active');
@@ -457,11 +508,12 @@ function openVisitModal(roomId = null) {
 async function handleVisitSubmit(e) {
     e.preventDefault();
     const tourTypeEl = document.querySelector('input[name="tourType"]:checked');
+    const propSelect = document.getElementById('visitPropertySelect');
     const payload = {
         name: document.getElementById('visitName').value,
         email: document.getElementById('visitEmail').value,
         phone: document.getElementById('visitPhone').value,
-        property_id: document.getElementById('visitPropertySelect').value,
+        property_id: propSelect ? propSelect.value : null,
         room_id: document.getElementById('visitRoomSelect').value || null,
         visit_date: document.getElementById('visitDate').value,
         visit_time: document.getElementById('visitTime').value,
@@ -472,7 +524,7 @@ async function handleVisitSubmit(e) {
     try {
         await AshroAPI.post('/visits', payload);
         closeModal('visitModal');
-        showToast('Your tour request has been confirmed. Our team will contact you.', 'success');
+        showToast('Visit confirmed! Manager Piyush has been notified via Email & SMS.', 'success');
         e.target.reset();
     } catch (err) {
         showToast(err.message || 'Failed to submit tour request', 'error');

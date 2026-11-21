@@ -6,6 +6,7 @@ from urllib.parse import urlparse, parse_qs
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from backend.config import HOST, PORT, FRONTEND_DIR
 import backend.models as models
+import backend.notifications as notifications
 
 class JSONResponse:
     @staticmethod
@@ -268,6 +269,10 @@ class AshroLivingHandler(BaseHTTPRequestHandler):
                     JSONResponse.error(self, f"Missing required field: {field}", 400)
                     return
             visit = models.create_visit(body)
+            try:
+                notifications.notify_admin_visit(visit)
+            except Exception as e:
+                print("Notification dispatch error:", e)
             JSONResponse.send(self, {"data": visit, "message": "Visit scheduled successfully"}, 201)
             return
 
