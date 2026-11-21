@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # Configuration from Environment Variables
-ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "piyush@automationwithpiyush.com")
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "vasudevahir21@gmail.com")
 ADMIN_PHONE = os.environ.get("ADMIN_PHONE", "9876543210")
 
 # SMTP / Email Configuration

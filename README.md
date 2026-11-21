@@ -40,7 +40,7 @@
 ## 📞 Official Concierge & Contact
 
 - **Founder & Manager:** Piyush
-- **Official Email:** `piyush@automationwithpiyush.com`
+- **Official Email:** `vasudevahir21@gmail.com`
 - **Phone & WhatsApp:** `+91 98765 43210` (`9876543210`)
 
 ---
@@ -56,7 +56,7 @@ Access to private portals is gated with credential verification:
 
 ### 2. Property Manager Hub (`/admin`)
 - Sign in with owner / administrator credentials.
-- **Manager:** `piyush@automationwithpiyush.com` / `admin123`
+- **Manager:** `vasudevahir21@gmail.com` / `admin123`
 - Features: Real-time occupancy KPIs, room inventory CRUD, tour request triage, maintenance desk, and master lease ledger.
 
 ---

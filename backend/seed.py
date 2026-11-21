@@ -169,7 +169,7 @@ def seed_database():
             ),
             (
                 "Admin",
-                "piyush@automationwithpiyush.com",
+                "vasudevahir21@gmail.com",
                 "admin123",
                 "9876543210",
                 "admin",

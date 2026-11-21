@@ -16,7 +16,7 @@ class TestAshroLivingCore(unittest.TestCase):
 
     def test_authentication(self):
         # Admin auth
-        admin = models.authenticate_user("piyush@automationwithpiyush.com", "admin123")
+        admin = models.authenticate_user("vasudevahir21@gmail.com", "admin123")
         self.assertIsNotNone(admin)
         self.assertEqual(admin['role'], 'admin')
 
