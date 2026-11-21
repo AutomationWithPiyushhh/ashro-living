@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ashro-living
+    runtime: python
+    plan: free
+    region: singapore # or oregon, frankfurt, etc.
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "./start.sh"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHONUNBUFFERED
+        value: "1"

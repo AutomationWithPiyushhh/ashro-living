@@ -1,0 +1,128 @@
+import unittest
+from backend.seed import seed_database
+import backend.models as models
+
+class TestAshroLivingCore(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        seed_database()
+
+    def test_properties(self):
+        props = models.get_all_properties()
+        self.assertGreaterEqual(len(props), 3)
+        names = [p['name'] for p in props]
+        self.assertTrue(any('Vastral' in n for n in names))
+        self.assertTrue(any('Naroda' in n for n in names))
+
+    def test_authentication(self):
+        # Admin auth
+        admin = models.authenticate_user("piyush@automationwithpiyush.com", "admin123")
+        self.assertIsNotNone(admin)
+        self.assertEqual(admin['role'], 'admin')
+
+        # Resident auth
+        resident = models.authenticate_user("aarav@example.com", "resident123")
+        self.assertIsNotNone(resident)
+        self.assertEqual(resident['role'], 'resident')
+
+        # Invalid auth
+        invalid = models.authenticate_user("aarav@example.com", "wrongpass")
+        self.assertIsNone(invalid)
+
+    def test_rooms_and_filtering(self):
+        all_rooms = models.get_rooms()
+        self.assertGreaterEqual(len(all_rooms), 6)
+
+        single_rooms = models.get_rooms(room_type="Single Private Room")
+        self.assertTrue(all(r['room_type'] == "Single Private Room" for r in single_rooms))
+
+        affordable = models.get_rooms(max_price=10000)
+        self.assertTrue(all(r['price_monthly'] <= 10000 for r in affordable))
+
+        search_res = models.get_rooms(search="Studio")
+        self.assertTrue(any("Studio" in r['name'] for r in search_res))
+
+    def test_room_details(self):
+        room = models.get_room_by_id(1)
+        self.assertIsNotNone(room)
+        self.assertEqual(room['name'], "Single Private Room (AC)")
+        self.assertIn("Bed", "".join(room['features']))
+        self.assertIn("beds", room)
+        self.assertGreaterEqual(len(room['beds']), 1)
+
+    def test_visit_creation_and_status(self):
+        new_visit = models.create_visit({
+            "name": "Kavita Roy",
+            "email": "kavita@test.com",
+            "phone": "+91 9988776655",
+            "property_id": 1,
+            "room_id": 1,
+            "visit_date": "2026-06-15",
+            "visit_time": "02:00 PM",
+            "tour_type": "Video Tour",
+            "notes": "Interested in 6-month stay"
+        })
+        self.assertIsNotNone(new_visit['id'])
+        self.assertEqual(new_visit['status'], "Scheduled")
+
+        updated = models.update_visit_status(new_visit['id'], "Completed")
+        self.assertEqual(updated['status'], "Completed")
+
+    def test_booking_creation_and_inventory(self):
+        new_booking = models.create_booking({
+            "room_id": 2, # Twin Comfort Suite
+            "guest_name": "Deepak Mehta",
+            "guest_email": "deepak.m@test.com",
+            "guest_phone": "+91 98712 34567",
+            "move_in_date": "2026-06-01",
+            "tenure_months": 6,
+            "token_amount_paid": 2000.0,
+            "special_requests": "Lower bunk or bed near window"
+        })
+        self.assertIsNotNone(new_booking['id'])
+        self.assertTrue(new_booking['booking_reference'].startswith("ASHRO-"))
+        self.assertEqual(new_booking['status'], "Confirmed")
+
+    def test_invoices_and_payment(self):
+        invoices = models.get_user_invoices(1)
+        self.assertGreaterEqual(len(invoices), 2)
+
+        pending = [inv for inv in invoices if inv['status'] == 'Pending']
+        if pending:
+            target = pending[0]
+            paid = models.pay_invoice(target['id'], "Credit Card")
+            self.assertEqual(paid['status'], "Paid")
+            self.assertIsNotNone(paid['paid_date'])
+
+    def test_tickets_flow(self):
+        ticket = models.create_ticket({
+            "user_id": 1,
+            "room_id": 1,
+            "category": "Housekeeping",
+            "title": "Extra linen change request",
+            "description": "Please arrange fresh bedsheets and towels for weekend.",
+            "priority": "Low"
+        })
+        self.assertIsNotNone(ticket['id'])
+        self.assertEqual(ticket['status'], "Open")
+
+        updated = models.update_ticket_status(ticket['id'], "Resolved", assigned_to="Deepak (Housekeeping)", resolution_notes="New linen set provided")
+        self.assertEqual(updated['status'], "Resolved")
+
+    def test_meal_planner(self):
+        meals = models.get_weekly_meals()
+        self.assertGreaterEqual(len(meals), 20)
+
+        # Set meal preference
+        pref = models.set_meal_preference(1, "2026-06-02", "Dinner", "Opted-Out")
+        self.assertEqual(pref['status'], "Opted-Out")
+
+    def test_admin_dashboard_stats(self):
+        stats = models.get_admin_dashboard_stats()
+        self.assertIn("total_properties", stats)
+        self.assertIn("occupancy_rate", stats)
+        self.assertIn("revenue_collected", stats)
+        self.assertGreater(stats['total_rooms'], 0)
+
+if __name__ == '__main__':
+    unittest.main()

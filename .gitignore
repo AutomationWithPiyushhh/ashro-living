@@ -1,0 +1,30 @@
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testing & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# SQLite Database (generated dynamically or seeded on startup)
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+!data/.gitkeep
+
+# macOS & Editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -1,0 +1,3 @@
+# Ashro Living uses the Python 3 standard library (http.server, sqlite3, json, etc.).
+# No external pip packages are strictly required.
+# If you wish to use a production WSGI server in the future, you can add gunicorn here.

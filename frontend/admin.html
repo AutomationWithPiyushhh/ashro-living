@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Hub — Ashro Living Amdavad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body style="background-color: var(--bg-primary);">
+
+    <!-- Top Admin Header -->
+    <header class="admin-header-bar">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <a href="/" class="brand-logo" style="color: var(--bg-primary);">Ashro Living</a>
+            <span class="admin-brand-tag">Manager &amp; Owner Hub</span>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <span style="font-size: 13px; color: var(--border-light);" id="adminProfileBar">
+                Manager &bull; <strong>Admin</strong> (piyush@automationwithpiyush.com)
+            </span>
+            <a href="/resident" class="btn-secondary" style="color: #FFF; border-color: rgba(255,255,255,0.4); padding: 6px 14px; font-size: 11px;">Resident View</a>
+            <a href="/" class="btn-secondary" style="color: #FFF; border-color: rgba(255,255,255,0.4); padding: 6px 14px; font-size: 11px;">Main Site</a>
+            <button class="btn-auth" style="border-color: rgba(255,255,255,0.3); color: #FFF;" onclick="AuthService.logout()">Sign Out</button>
+        </div>
+    </header>
+
+    <!-- Auth Barrier (Visible if unauthenticated) -->
+    <div id="adminAuthBarrier" class="auth-barrier-box" style="display: none;">
+        <span class="brand-logo" style="font-size: 32px; display: block; margin-bottom: 8px;">Ashro Living</span>
+        <h3 style="font-size: 24px; margin-bottom: 10px;">Manager Login Required</h3>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+            Access restricted to verified PG managers and administrators. Please sign in with your manager credentials.
+        </p>
+        <button class="btn-primary" style="width: 100%;" onclick="openAdminLoginModal()">Sign In as Manager &rarr;</button>
+        <div style="margin-top: 14px;">
+            <a href="/" style="font-size: 12px; color: var(--accent-cocoa);">Back to Homepage</a>
+        </div>
+    </div>
+
+    <!-- Protected Admin Area -->
+    <div id="adminMainContent">
+        <!-- Navigation Tabs -->
+        <div class="admin-tabs-nav">
+            <div class="admin-tab-item active" data-tab="overview" onclick="switchAdminTab('overview', this)">Overview &amp; Occupancy</div>
+            <div class="admin-tab-item" data-tab="rooms" onclick="switchAdminTab('rooms', this)">Rooms &amp; Beds</div>
+            <div class="admin-tab-item" data-tab="visits" onclick="switchAdminTab('visits', this)">Visit Schedules <span class="pill-count" id="badgeVisits">0</span></div>
+            <div class="admin-tab-item" data-tab="tickets" onclick="switchAdminTab('tickets', this)">Complaints &amp; Maintenance <span class="pill-count" id="badgeTickets">0</span></div>
+            <div class="admin-tab-item" data-tab="bookings" onclick="switchAdminTab('bookings', this)">Bookings &amp; Residents</div>
+        </div>
+
+        <div class="admin-body-wrap">
+
+            <!-- TAB 1: Overview -->
+            <div class="tab-pane active" id="admin-tab-overview">
+                <!-- KPI Tiles -->
+                <div class="admin-kpi-grid">
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-title">Bed Occupancy Rate</span>
+                        </div>
+                        <div class="kpi-tile-value" id="kpiOccupancy">0%</div>
+                        <span class="kpi-tile-sub" id="kpiBedsSub">Calculating bed occupancy...</span>
+                    </div>
+
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-title">Total Rent Collected</span>
+                        </div>
+                        <div class="kpi-tile-value" id="kpiRevenue">₹0</div>
+                        <span class="kpi-tile-sub">Collected this cycle</span>
+                    </div>
+
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-title">Pending Rent</span>
+                        </div>
+                        <div class="kpi-tile-value" id="kpiPending" style="color: #9A3412;">₹0</div>
+                        <span class="kpi-tile-sub">Awaiting resident payment</span>
+                    </div>
+
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-title">Open Complaints</span>
+                        </div>
+                        <div class="kpi-tile-value" id="kpiTickets">0</div>
+                        <span class="kpi-tile-sub">Pending caretaker action</span>
+                    </div>
+                </div>
+
+                <!-- Recent Reservations -->
+                <div class="admin-card-surface">
+                    <div class="admin-action-row">
+                        <div>
+                            <h3 style="font-size: 22px;">Recent Room Bookings</h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Online bookings received from website visitors.</p>
+                        </div>
+                        <button class="btn-secondary" onclick="switchAdminTab('bookings')" style="font-size: 11px;">View All Bookings &rarr;</button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="admin-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Booking Ref</th>
+                                    <th>Resident</th>
+                                    <th>Phone</th>
+                                    <th>Move-In Date</th>
+                                    <th>Monthly Rent</th>
+                                    <th>Token Paid</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overviewBookingsTable">
+                                <tr><td colspan="7" style="text-align: center; padding: 20px;">Loading reservations...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Inventory -->
+            <div class="tab-pane" id="admin-tab-rooms">
+                <div class="admin-action-row">
+                    <div>
+                        <h3 style="font-size: 24px;">Rooms &amp; Bed Capacity Management</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Update room rent, bed availability, or add new rooms to the catalog.</p>
+                    </div>
+                    <button class="btn-primary" onclick="openAddRoomModal()">+ Add New Room</button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-data-table">
+                        <thead>
+                            <tr>
+                                <th>Room Name</th>
+                                <th>PG Branch</th>
+                                <th>Sharing Type</th>
+                                <th>Monthly Rent</th>
+                                <th>Deposit</th>
+                                <th>Total Beds</th>
+                                <th>Available Beds</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminRoomsTableBody">
+                            <tr><td colspan="9" style="text-align: center; padding: 20px;">Loading rooms...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: Tour Schedule -->
+            <div class="tab-pane" id="admin-tab-visits">
+                <div class="admin-action-row">
+                    <div>
+                        <h3 style="font-size: 24px;">Scheduled PG Visits</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">In-person visit appointments scheduled by students, professionals, or parents.</p>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-data-table">
+                        <thead>
+                            <tr>
+                                <th>Visitor Name</th>
+                                <th>Contact Information</th>
+                                <th>PG Branch</th>
+                                <th>Interested In</th>
+                                <th>Date &amp; Time Slot</th>
+                                <th>Visit Type</th>
+                                <th>Notes</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminVisitsTableBody">
+                            <tr><td colspan="9" style="text-align: center; padding: 20px;">Loading visits...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: Service Triage -->
+            <div class="tab-pane" id="admin-tab-tickets">
+                <div class="admin-action-row">
+                    <div>
+                        <h3 style="font-size: 24px;">Complaints &amp; Maintenance Requests</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Assign caretakers, update resolution status, and notify residents.</p>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-data-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket #</th>
+                                <th>Resident &amp; Room</th>
+                                <th>Category</th>
+                                <th>Issue Details</th>
+                                <th>Urgency</th>
+                                <th>Assigned Caretaker</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTicketsTableBody">
+                            <tr><td colspan="8" style="text-align: center; padding: 20px;">Loading complaints...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 5: Master Ledger -->
+            <div class="tab-pane" id="admin-tab-bookings">
+                <div class="admin-action-row">
+                    <div>
+                        <h3 style="font-size: 24px;">Resident Bookings &amp; Stay Records</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">All confirmed residents, monthly rent, and deposit records.</p>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-data-table">
+                        <thead>
+                            <tr>
+                                <th>Booking Ref</th>
+                                <th>Resident Name</th>
+                                <th>Contact Details</th>
+                                <th>PG Branch &amp; Room</th>
+                                <th>Move-In Date</th>
+                                <th>Duration</th>
+                                <th>Monthly Rent</th>
+                                <th>Security Deposit</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminBookingsTableBody">
+                            <tr><td colspan="9" style="text-align: center; padding: 20px;">Loading bookings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 1: Add Room Modal -->
+    <div class="modal-overlay" id="addRoomModal">
+        <div class="modal-card" style="max-width: 640px;">
+            <button class="modal-close" onclick="closeModal('addRoomModal')">&times;</button>
+            <h3 style="font-size: 24px; margin-bottom: 6px;">Add New Room to PG</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Add a new room or sharing bed to the Ashro Living catalog.</p>
+
+            <form onsubmit="handleAddRoomSubmit(event)">
+                <div class="form-group">
+                    <label>Select PG Branch *</label>
+                    <select id="newRoomPropertyId" required>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Room Title *</label>
+                        <input type="text" id="newRoomName" required placeholder="e.g. Deluxe Single AC Room">
+                    </div>
+                    <div class="form-group">
+                        <label>Room Sharing Type *</label>
+                        <select id="newRoomType">
+                            <option value="Single Private Room">Single Private Room</option>
+                            <option value="Double Sharing">Double Sharing (2 Sharing)</option>
+                            <option value="Studio Living">Studio Room with Balcony</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Monthly Rent (₹) *</label>
+                        <input type="number" id="newRoomPrice" required placeholder="14500">
+                    </div>
+                    <div class="form-group">
+                        <label>Security Deposit (₹)</label>
+                        <input type="number" id="newRoomDeposit" placeholder="14500">
+                    </div>
+                    <div class="form-group">
+                        <label>Room Size (sq.ft)</label>
+                        <input type="number" id="newRoomSqft" value="220">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Room Photo URL *</label>
+                    <input type="url" id="newRoomCoverImage" required value="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80">
+                </div>
+
+                <div class="form-group">
+                    <label>Amenities Included (Comma-separated)</label>
+                    <input type="text" id="newRoomFeatures" value="Comfortable Bed, Attached Bathroom, Study Table & Chair, AC, Cupboard">
+                </div>
+
+                <div class="form-group">
+                    <label>Room Description *</label>
+                    <textarea id="newRoomDescription" rows="2" required placeholder="Describe the room, ventilation, balcony, storage..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%;">Save &amp; Publish Room &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Triage Ticket Modal -->
+    <div class="modal-overlay" id="triageTicketModal">
+        <div class="modal-card" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeModal('triageTicketModal')">&times;</button>
+            <h3 style="font-size: 24px; margin-bottom: 6px;">Resolve Resident Complaint</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;" id="triageTicketSubtitle"></p>
+
+            <form onsubmit="handleTriageTicketSubmit(event)">
+                <input type="hidden" id="triageTicketId">
+                <div class="form-group">
+                    <label>Current Status</label>
+                    <select id="triageStatus">
+                        <option value="In Progress">In Progress (Staff Dispatched)</option>
+                        <option value="Resolved">Resolved (Work Completed)</option>
+                        <option value="Open">Open (Pending Assignment)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assign Caretaker / Technician</label>
+                    <select id="triageAssignedTo">
+                        <option value="PG Caretaker">PG Caretaker</option>
+                        <option value="Wi-Fi Technician">Wi-Fi &amp; Internet Technician</option>
+                        <option value="AC Technician">AC &amp; Electrical Technician</option>
+                        <option value="Housekeeping Staff">Housekeeping Staff</option>
+                        <option value="Plumber">Plumber</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Resolution Notes for Resident</label>
+                    <textarea id="triageResolutionNotes" rows="3" placeholder="e.g. Wi-Fi router rebooted and speed tested. Working smoothly now."></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Save &amp; Update Resident &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Admin Auth Modal -->
+    <div class="modal-overlay" id="adminAuthModal">
+        <div class="modal-card" style="max-width: 440px;">
+            <button class="modal-close" onclick="closeModal('adminAuthModal')">&times;</button>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span class="brand-logo" style="font-size: 26px;">Ashro Living</span>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">PG Manager Sign In</p>
+            </div>
+            <form onsubmit="handleAdminPageLogin(event)">
+                <div class="form-group">
+                    <label>Manager Email</label>
+                    <input type="email" id="admEmailInput" required placeholder="Enter your manager email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="admPasswordInput" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Sign In as Manager &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

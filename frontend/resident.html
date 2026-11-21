@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resident Portal — Ashro Living</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/resident.css">
+</head>
+<body style="background-color: var(--bg-primary);">
+
+    <!-- Top Brand Navbar -->
+    <header class="resident-topbar">
+        <div class="brand-wrapper">
+            <a href="/" class="brand-logo">Ashro Living</a>
+            <span class="brand-subline">Resident Portal &bull; Amdavad</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="/" class="btn-secondary" style="padding: 7px 16px; font-size: 11px;">Main Website</a>
+            <button class="btn-auth" onclick="AuthService.logout()">Sign Out</button>
+        </div>
+    </header>
+
+    <!-- Auth Barrier (Visible if unauthenticated) -->
+    <div id="residentAuthBarrier" class="auth-barrier-box" style="display: none;">
+        <span class="brand-logo" style="font-size: 32px; display: block; margin-bottom: 8px;">Ashro Living</span>
+        <h3 style="font-size: 24px; margin-bottom: 10px;">Resident Login Required</h3>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+            Please sign in with your registered resident email and password to view your room details, pay rent, see food menu, or submit a complaint.
+        </p>
+        <button class="btn-primary" style="width: 100%;" onclick="openAuthModal()">Sign In as Resident &rarr;</button>
+        <div style="margin-top: 14px;">
+            <a href="/" style="font-size: 12px; color: var(--accent-cocoa);">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Protected Resident Dashboard Area -->
+    <div id="residentMainContent">
+        <!-- Resident Hero Profile Bar -->
+        <div class="resident-hero-card">
+            <div class="resident-profile">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Resident Avatar" class="resident-photo">
+                <div class="resident-meta">
+                    <h2 id="resProfileName">Aarav Sharma</h2>
+                    <p>Ashro Living &bull; Vastral PG (Amdavad) &bull; <strong style="color: var(--bg-primary);">Room 101, Bed A</strong></p>
+                    <div class="resident-pills">
+                        <span class="resident-pill active">Active Stay</span>
+                        <span class="resident-pill tag">ID Verified</span>
+                        <span class="resident-pill tag">Resident ID: ASHRO-2026-101A</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-secondary" style="color: #FFF; border-color: rgba(255,255,255,0.4);" onclick="openRaiseTicketModal()">+ Submit Complaint</button>
+                <button class="btn-primary" style="background: var(--bg-primary); color: var(--text-heading);" onclick="switchTab('invoices')">View Invoices</button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="resident-tabs-bar">
+            <div class="resident-tab active" data-tab="stay" onclick="switchTab('stay', this)">My Room Details</div>
+            <div class="resident-tab" data-tab="invoices" onclick="switchTab('invoices', this)">Rent &amp; Invoices</div>
+            <div class="resident-tab" data-tab="tickets" onclick="switchTab('tickets', this)">Complaints &amp; Help</div>
+            <div class="resident-tab" data-tab="meals" onclick="switchTab('meals', this)">Weekly Food Menu</div>
+            <div class="resident-tab" data-tab="notices" onclick="switchTab('notices', this)">Notice Board</div>
+        </div>
+
+        <!-- Container -->
+        <div class="resident-content-wrap">
+
+            <!-- TAB 1: Stay Overview -->
+            <div class="tab-pane active" id="tab-stay">
+                <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+                    <div class="portal-box">
+                        <div class="portal-box-header">
+                            <h3>Your Allocated Room &amp; Bed</h3>
+                            <span class="status-badge paid">6 Months Stay</span>
+                        </div>
+
+                        <div style="display: flex; gap: 18px; margin-bottom: 24px; align-items: center; background: var(--bg-primary); padding: 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+                            <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=300&q=80" alt="Room Photo" style="width: 120px; height: 90px; object-fit: cover; border-radius: 4px;">
+                            <div>
+                                <h4 style="font-size: 20px; color: var(--text-heading); margin-bottom: 2px;">Single Occupancy AC Room</h4>
+                                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Room 101-A &bull; Attached Bathroom &bull; 210 sq.ft</p>
+                                <div style="font-size: 15px; font-weight: 700; color: var(--text-heading);">
+                                    ₹13,500 / month <span style="font-size: 11px; font-weight: 500; color: var(--accent-cocoa);">(₹1,000 long-stay discount applied)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+                                <span style="color: var(--text-muted);">PG Address:</span>
+                                <strong>Vastral PG &bull; Near Nirant Cross Rd, SP Ring Road, Amdavad</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Move-in Date:</span>
+                                <strong>October 20, 2026</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Stay Duration:</span>
+                                <strong>6 Months (Renewable)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Security Deposit:</span>
+                                <strong>₹14,500.00 (Refundable upon checkout)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Main Door Biometric Access:</span>
+                                <strong style="color: var(--accent-cocoa);">Active &amp; Working</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="portal-box">
+                            <h4 style="font-size: 18px; margin-bottom: 12px;">High-Speed Wi-Fi Details</h4>
+                            <div style="background: var(--bg-primary); padding: 14px; border-radius: var(--radius-xs); border: 1px solid var(--border-light); font-size: 13px; margin-bottom: 10px;">
+                                <div style="margin-bottom: 6px;"><strong>Wi-Fi Name:</strong> <code>Ashro_Vastral_WiFi</code></div>
+                                <div><strong>Password:</strong> <code>AshroLiving2026</code></div>
+                            </div>
+                            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">Unlimited 300+ Mbps high-speed internet across all rooms, dining area, and study spaces.</p>
+                        </div>
+
+                        <div class="portal-box">
+                            <h4 style="font-size: 18px; margin-bottom: 12px;">PG Manager Contact</h4>
+                            <div style="font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                                <div><strong>Manager / Owner:</strong> Admin</div>
+                                <div><strong>Direct Phone:</strong> +91 98765 43210</div>
+                                <div><strong>Email:</strong> piyush@automationwithpiyush.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Invoices -->
+            <div class="tab-pane" id="tab-invoices">
+                <div class="portal-box">
+                    <div class="portal-box-header">
+                        <div>
+                            <h3>Rent &amp; Payment History</h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">See all your monthly rent receipts and pay pending rent online.</p>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="portal-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Description</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoicesTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 30px;">Loading invoices...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Service Requests -->
+            <div class="tab-pane" id="tab-tickets">
+                <div class="portal-box">
+                    <div class="portal-box-header">
+                        <div>
+                            <h3>Complaints &amp; Maintenance Requests</h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Facing any issue with Wi-Fi, AC, plumbing, or room cleaning? Submit a complaint here.</p>
+                        </div>
+                        <button class="btn-primary" onclick="openRaiseTicketModal()">+ Submit New Complaint</button>
+                    </div>
+
+                    <div id="ticketsListContainer">
+                        <div style="text-align: center; padding: 30px;">Loading complaints...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: Dining Menu -->
+            <div class="tab-pane" id="tab-meals">
+                <div class="portal-box">
+                    <div class="portal-box-header">
+                        <div>
+                            <h3>Weekly Food Menu (Breakfast, Lunch &amp; Dinner)</h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Hygienic, tasty Gujarati &amp; North Indian home-style meals prepared fresh daily.</p>
+                        </div>
+                        <span class="status-badge paid">All 3 Meals Included</span>
+                    </div>
+
+                    <div class="meals-calendar-grid" id="mealsGridContainer">
+                        <div style="text-align: center; padding: 30px;">Loading food menu...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: Notices -->
+            <div class="tab-pane" id="tab-notices">
+                <div class="portal-box">
+                    <div class="portal-box-header">
+                        <div>
+                            <h3>PG Notice Board</h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Important notices and updates from the PG manager.</p>
+                        </div>
+                    </div>
+
+                    <div id="noticesContainer">
+                        <div style="text-align: center; padding: 30px;">Loading notices...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 1: Pay Due Rent Modal -->
+    <div class="modal-overlay" id="payRentModal">
+        <div class="modal-card" style="max-width: 480px;">
+            <button class="modal-close" onclick="closeModal('payRentModal')">&times;</button>
+            <h3 style="font-size: 24px; margin-bottom: 6px;">Pay Rent Online</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Quick and safe payment via UPI, Cards, or NetBanking.</p>
+
+            <div id="payInvoiceSummary" style="background: var(--bg-primary); padding: 16px; border-radius: var(--radius-xs); border: 1px solid var(--border-light); margin-bottom: 20px;"></div>
+
+            <form onsubmit="handlePaySubmit(event)">
+                <input type="hidden" id="payInvoiceId">
+                <div class="form-group">
+                    <label>Choose Payment Method</label>
+                    <select id="payMethodSelect">
+                        <option value="UPI (Google Pay / PhonePe / Paytm)">UPI (Google Pay / PhonePe / Paytm)</option>
+                        <option value="NetBanking">NetBanking (SBI / HDFC / ICICI / Axis)</option>
+                        <option value="Debit Card">Debit / Credit Card</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Pay Now &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Raise Ticket Modal -->
+    <div class="modal-overlay" id="raiseTicketModal">
+        <div class="modal-card" style="max-width: 520px;">
+            <button class="modal-close" onclick="closeModal('raiseTicketModal')">&times;</button>
+            <h3 style="font-size: 24px; margin-bottom: 6px;">Submit a Complaint / Request</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Our caretaker and repair staff will resolve it promptly.</p>
+
+            <form onsubmit="handleRaiseTicketSubmit(event)">
+                <div class="form-group">
+                    <label>Problem Category *</label>
+                    <select id="ticketCategory" required>
+                        <option value="Wi-Fi & Connectivity">Wi-Fi &amp; Internet</option>
+                        <option value="Climate Control & AC">AC &amp; Fan</option>
+                        <option value="Plumbing & Bathroom">Bathroom &amp; Water</option>
+                        <option value="Housekeeping & Linen">Room Cleaning &amp; Housekeeping</option>
+                        <option value="Electrical & Lighting">Electrical &amp; Switch / Light</option>
+                        <option value="Carpentry & Joinery">Cupboard &amp; Bed / Door</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>How Urgent Is It? *</label>
+                    <select id="ticketPriority">
+                        <option value="Low">Normal (Within 24 Hours)</option>
+                        <option value="Medium" selected>Moderate (Within 6-12 Hours)</option>
+                        <option value="High">Urgent (Immediate attention)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Issue Title *</label>
+                    <input type="text" id="ticketTitle" required placeholder="e.g. Wi-Fi slow in room 101 or Tap leaking">
+                </div>
+                <div class="form-group">
+                    <label>Describe the Issue *</label>
+                    <textarea id="ticketDescription" rows="3" required placeholder="Please describe what is wrong and what time you are in your room..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Submit Complaint &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Auth modal for resident sign-in -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card" style="max-width: 440px;">
+            <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span class="brand-logo" style="font-size: 26px;">Ashro Living</span>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Resident Sign In</p>
+            </div>
+            <form onsubmit="handleResidentPageLogin(event)">
+                <div class="form-group">
+                    <label>Your Registered Email</label>
+                    <input type="email" id="resEmailInput" required placeholder="Enter your email address">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="resPasswordInput" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Sign In &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/resident.js"></script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+/* ==========================================================================
+   ASHRO LIVING RESIDENT DESK — CUSTOM STYLING (WARM LUXURY PALETTE, NO GREEN)
+   ========================================================================== */
+
+.resident-topbar {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resident-hero-card {
+    background: var(--text-heading);
+    color: var(--bg-primary);
+    padding: 36px 6%;
+    border-bottom: 3px solid var(--accent-mocha);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.resident-profile {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.resident-photo {
+    width: 68px;
+    height: 68px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--accent-mocha);
+    object-fit: cover;
+}
+
+.resident-meta h2 {
+    font-size: 28px;
+    color: var(--bg-primary);
+    margin-bottom: 4px;
+}
+
+.resident-meta p {
+    font-size: 13px;
+    color: var(--border-light);
+}
+
+.resident-pills {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.resident-pill {
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.resident-pill.active {
+    background: var(--sand-glow);
+    color: var(--text-heading);
+}
+
+.resident-pill.tag {
+    background: rgba(247, 243, 237, 0.15);
+    color: var(--bg-primary);
+    border: 1px solid rgba(247, 243, 237, 0.3);
+}
+
+/* Tab Navigation */
+.resident-tabs-bar {
+    background: var(--bg-surface);
+    padding: 0 6%;
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid var(--border-light);
+    overflow-x: auto;
+}
+
+.resident-tab {
+    padding: 18px 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.resident-tab:hover {
+    color: var(--text-heading);
+}
+
+.resident-tab.active {
+    color: var(--text-heading);
+    border-bottom-color: var(--accent-mocha);
+}
+
+/* Layout */
+.resident-content-wrap {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.portal-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 28px;
+    box-shadow: var(--shadow-subtle);
+    margin-bottom: 24px;
+}
+
+.portal-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.portal-box-header h3 {
+    font-size: 22px;
+    color: var(--text-heading);
+}
+
+/* Tables */
+.portal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+.portal-table th {
+    background: var(--bg-primary);
+    padding: 12px 16px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.portal-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.paid,
+.status-badge.resolved {
+    background: var(--sand-glow);
+    color: var(--accent-cocoa);
+    border: 1px solid var(--accent-mocha);
+}
+
+.status-badge.pending,
+.status-badge.open {
+    background: #FDF4E7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+}
+
+.status-badge.in-progress {
+    background: #F2ECE3;
+    color: var(--text-heading);
+    border: 1px solid var(--border-light);
+}
+
+/* Meals Grid */
+.meals-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.meal-day-tile {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+}
+
+.meal-day-tile.today {
+    background: var(--bg-surface);
+    border: 2px solid var(--accent-mocha);
+    box-shadow: var(--shadow-medium);
+}
+
+.meal-slot-item {
+    margin-top: 10px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xs);
+    padding: 10px 12px;
+}
+
+.meal-day-tile.today .meal-slot-item {
+    background: var(--bg-primary);
+}
+
+/* Protected Gate Barrier */
+.auth-barrier-box {
+    max-width: 480px;
+    margin: 80px auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    text-align: center;
+    box-shadow: var(--shadow-elevated);
+}

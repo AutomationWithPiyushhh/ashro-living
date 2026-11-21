@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashro Living — Paying Guest (PG) & Co-Living in Amdavad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <span class="promo-pill">Zero Brokerage</span>
+        <span>Best PG in Amdavad for Students &amp; Working Professionals &bull; Food &amp; Wi-Fi Included</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="brand-wrapper">
+            <a href="/" class="brand-logo">Ashro Living</a>
+            <span class="brand-subline">PG &bull; Amdavad</span>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a href="#locations">Our PGs in Amdavad</a></li>
+            <li><a href="#rooms">Rooms &amp; Rent</a></li>
+            <li><a href="#facilities">What is Included</a></li>
+            <li><a href="#upcoming">Opening Soon</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact &amp; Address</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <!-- Single Sign In Action -->
+            <button class="btn-auth" onclick="openAuthModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span id="navAuthLabel">Sign In</span>
+            </button>
+
+            <!-- Book a Visit CTA -->
+            <button class="btn-primary" onclick="openVisitModal()">Book a Visit</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-inner">
+            <span class="hero-tag">Amdavad PG &bull; Vastral &bull; Naroda &bull; Rabari Colony</span>
+            <h1>Clean, Comfortable PGs in Amdavad.<br><em>Feel at Home from Day One.</em></h1>
+            <p>Looking for a good PG in Ahmedabad? We give you fully furnished rooms, 3 daily home-cooked meals, fast Wi-Fi, daily room cleaning, and zero brokerage. Just bring your clothes and move in.</p>
+            <div class="hero-actions">
+                <a href="#rooms" class="btn-primary" style="padding: 14px 34px;">View Rooms &amp; Prices</a>
+                <button class="btn-secondary" style="color: #FFF; border-color: rgba(255,255,255,0.4);" onclick="openVisitModal()">
+                    Schedule a Visit
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Search & Filter Widget -->
+    <div class="search-container">
+        <div class="input-block">
+            <label>Select PG Location in Amdavad</label>
+            <select id="searchLocation">
+                <option value="">All 3 PGs (Vastral, Naroda, Rabari Colony)</option>
+            </select>
+        </div>
+        <div class="input-block">
+            <label>Room Sharing Type</label>
+            <select id="searchRoomType">
+                <option value="all">All Room Types</option>
+                <option value="Single Private Room">Single Room (Private)</option>
+                <option value="Double Sharing">2 Sharing (Double)</option>
+                <option value="Studio Living">Studio Room with Balcony</option>
+            </select>
+        </div>
+        <div class="input-block">
+            <label>Expected Move-in Date</label>
+            <input type="date" id="searchMoveInDate">
+        </div>
+        <button class="btn-primary" onclick="applySearchFilters()" style="height: 48px;">
+            Find Rooms
+        </button>
+    </div>
+
+    <!-- Active PG Locations in Amdavad (Clear Addresses & Directions) -->
+    <section id="locations" class="locations-ribbon">
+        <div style="text-align: center; max-width: 680px; margin: 0 auto 36px;">
+            <span class="section-eyebrow">Find Your Nearest PG</span>
+            <h2 style="font-size: 34px; margin-bottom: 8px;">Our 3 Operating PGs in Amdavad</h2>
+            <p style="font-size: 14px; color: var(--text-muted);">Easily accessible locations near metro stations, ring roads, and bus stops.</p>
+        </div>
+        <div class="locations-grid">
+            <!-- Location 1: Vastral -->
+            <div class="location-card">
+                <span class="location-status-tag active">Open &amp; Operating</span>
+                <h3>Vastral PG</h3>
+                <p><strong>Address:</strong> Near Nirant Cross Road, SP Ring Road, Vastral, Amdavad 382418.</p>
+                <p style="margin-top: 6px;"><strong>Landmark:</strong> 2 minutes from SP Ring Road. Very easy connectivity to Odhav GIDC, Nikol, and Eastern Ahmedabad offices.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <a href="tel:9876543210" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">
+                        Call for Directions
+                    </a>
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal(1)">
+                        Visit Today
+                    </button>
+                </div>
+            </div>
+
+            <!-- Location 2: Naroda -->
+            <div class="location-card">
+                <span class="location-status-tag active">Open &amp; Operating</span>
+                <h3>Naroda PG</h3>
+                <p><strong>Address:</strong> Near Galaxy Cinema, Naroda-Dehgam Road, Naroda, Amdavad 382330.</p>
+                <p style="margin-top: 6px;"><strong>Landmark:</strong> Main road location near Galaxy Cinema. Close to Naroda GIDC, markets, food joints, and AMTS/BRTS bus stop.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <a href="tel:9876543210" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">
+                        Call for Directions
+                    </a>
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal(2)">
+                        Visit Today
+                    </button>
+                </div>
+            </div>
+
+            <!-- Location 3: Rabari Colony -->
+            <div class="location-card">
+                <span class="location-status-tag active">Open &amp; Operating</span>
+                <h3>Rabari Colony Metro PG</h3>
+                <p><strong>Address:</strong> Opposite Metro Pillar 118, Rabari Colony Metro Station, Amraiwadi, Amdavad 380026.</p>
+                <p style="margin-top: 6px;"><strong>Landmark:</strong> Just 2 minutes walking distance from Rabari Colony Metro Station. Direct metro to Kalupur Railway Station &amp; West Ahmedabad.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <a href="tel:9876543210" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">
+                        Call for Directions
+                    </a>
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="openVisitModal(3)">
+                        Visit Today
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Available Rooms Catalog -->
+    <section id="rooms">
+        <div class="section-head">
+            <span class="section-eyebrow">Transparent Pricing &bull; Zero Brokerage</span>
+            <h2>Available Rooms &amp; Monthly Rent</h2>
+            <p>Every room comes with a soft bed, mattress, personal study desk, lockable wardrobe, attached washroom, and daily cleaning. Rent includes your daily food and Wi-Fi.</p>
+        </div>
+
+        <!-- Filter Row -->
+        <div class="filter-row">
+            <div class="category-pills">
+                <button class="category-pill active" onclick="setRoomTypeFilter('all', this)">All Rooms</button>
+                <button class="category-pill" onclick="setRoomTypeFilter('Single Private Room', this)">Single Private Room</button>
+                <button class="category-pill" onclick="setRoomTypeFilter('Double Sharing', this)">2 Sharing Room</button>
+                <button class="category-pill" onclick="setRoomTypeFilter('Studio Living', this)">Studio Room (Balcony)</button>
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted);" id="residenceCounterText">
+                Showing available rooms
+            </div>
+        </div>
+
+        <!-- Rooms List Grid -->
+        <div class="rooms-list" id="roomsContainer">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                Loading available rooms in Amdavad...
+            </div>
+        </div>
+    </section>
+
+    <!-- What is Included (Facilities in Plain English) -->
+    <section id="facilities" class="amenities-section">
+        <div class="section-head">
+            <span class="section-eyebrow">All-in-One Rent</span>
+            <h2>Everything Included in Your Monthly Rent</h2>
+            <p>No extra bill for food, internet, or cleaning. Pay one simple rent every month and enjoy all facilities.</p>
+        </div>
+
+        <div class="amenities-grid">
+            <div class="amenity-card">
+                <div class="amenity-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                </div>
+                <h4>3 Times Daily Homemade Food</h4>
+                <p>Fresh breakfast, wholesome lunch, and dinner prepared daily in our clean kitchen. Proper Gujarati and North Indian taste.</p>
+            </div>
+
+            <div class="amenity-card">
+                <div class="amenity-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>
+                </div>
+                <h4>Free High-Speed Wi-Fi</h4>
+                <p>Fast optical fiber internet with routers on every floor. Smooth connection for study, video meetings, and YouTube.</p>
+            </div>
+
+            <div class="amenity-card">
+                <div class="amenity-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <h4>Daily Room &amp; Bathroom Cleaning</h4>
+                <p>Our cleaning staff cleans rooms and bathrooms every day. Clean dustbins and mop floors so your room stays spotless.</p>
+            </div>
+
+            <div class="amenity-card">
+                <div class="amenity-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <h4>24/7 Security &amp; CCTV</h4>
+                <p>CCTV cameras on all gates, hallways, and entrance doors. Safe and secure environment for both boys and girls.</p>
+            </div>
+
+            <div class="amenity-card">
+                <div class="amenity-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                </div>
+                <h4>100% Power Backup</h4>
+                <p>Generator backup ensures your lights, fans, mobile charging, and Wi-Fi continue running even during power cuts.</p>
+            </div>
+
+            <div class="amenity-card">
+                <div class="amenity-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                </div>
+                <h4>Hot Water Geyser &amp; RO Water</h4>
+                <p>Pure chilled RO drinking water on every floor and instant hot water geysers in all attached washrooms.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Locations in Amdavad -->
+    <section id="upcoming" class="upcoming-section">
+        <div class="section-head">
+            <span class="section-eyebrow">Expansion in Amdavad</span>
+            <h2>Opening Soon in New Areas of Ahmedabad</h2>
+            <p>We are opening new PGs in top locations of West and Central Ahmedabad. Pre-book your bed early before seats fill up.</p>
+        </div>
+
+        <div class="upcoming-grid">
+            <div class="upcoming-box">
+                <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80" alt="CG Road PG" class="upcoming-img">
+                <div class="upcoming-content">
+                    <span class="location-status-tag upcoming">Opening Soon</span>
+                    <h3>CG Road, Navrangpura</h3>
+                    <p>Walk to colleges, coaching centers, and shopping markets. Very convenient central location.</p>
+                    <button class="btn-secondary" style="width: 100%; font-size: 11px; text-align: center;" onclick="openWaitlistModal('CG Road')">
+                        Pre-Book Bed &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <div class="upcoming-box">
+                <img src="https://images.unsplash.com/photo-1600573472550-8090b5e0745e?auto=format&fit=crop&w=800&q=80" alt="Thaltej PG" class="upcoming-img">
+                <div class="upcoming-content">
+                    <span class="location-status-tag upcoming">Opening Soon</span>
+                    <h3>Thaltej, SG Highway</h3>
+                    <p>Near Sindhu Bhavan Road &amp; SG Highway. Best for IT employees and corporate workers.</p>
+                    <button class="btn-secondary" style="width: 100%; font-size: 11px; text-align: center;" onclick="openWaitlistModal('Thaltej')">
+                        Pre-Book Bed &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <div class="upcoming-box">
+                <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80" alt="Vastrapur PG" class="upcoming-img">
+                <div class="upcoming-content">
+                    <span class="location-status-tag upcoming">Opening Soon</span>
+                    <h3>Vastrapur Lake</h3>
+                    <p>Walkable to IIM Ahmedabad, Vastrapur Lake, and Alpha One Mall. Safe student locality.</p>
+                    <button class="btn-secondary" style="width: 100%; font-size: 11px; text-align: center;" onclick="openWaitlistModal('Vastrapur')">
+                        Pre-Book Bed &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <div class="upcoming-box">
+                <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80" alt="Navrangpura PG" class="upcoming-img">
+                <div class="upcoming-content">
+                    <span class="location-status-tag upcoming">Opening Soon</span>
+                    <h3>Navrangpura University Area</h3>
+                    <p>Close to Commerce Six Roads and Gujarat University campus. Ideal for college students.</p>
+                    <button class="btn-secondary" style="width: 100%; font-size: 11px; text-align: center;" onclick="openWaitlistModal('Navrangpura')">
+                        Pre-Book Bed &rarr;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Easy FAQ Section -->
+    <section id="faq" style="background: var(--bg-surface); border-top: 1px solid var(--border-light);">
+        <div class="section-head">
+            <span class="section-eyebrow">Clear Answers</span>
+            <h2>Common Questions Asked by Students &amp; Parents</h2>
+            <p>Everything you need to know before visiting our PG in Amdavad.</p>
+        </div>
+
+        <div class="faq-wrap">
+            <div class="faq-box open">
+                <div class="faq-question-btn" onclick="toggleFaq(this)">
+                    <span>Is there any brokerage or agent commission?</span>
+                    <span class="faq-chevron">&#9662;</span>
+                </div>
+                <div class="faq-answer-body">
+                    No, there is <strong>zero brokerage</strong>. You deal directly with the PG owner and management. You do not have to pay any agent or broker charges.
+                </div>
+            </div>
+
+            <div class="faq-box">
+                <div class="faq-question-btn" onclick="toggleFaq(this)">
+                    <span>Is food included in the monthly rent?</span>
+                    <span class="faq-chevron">&#9662;</span>
+                </div>
+                <div class="faq-answer-body">
+                    Yes, healthy home-cooked breakfast, lunch, and dinner are included in the monthly rent. We serve clean Gujarati and North Indian meals with fresh rotis, sabzi, dal, and rice.
+                </div>
+            </div>
+
+            <div class="faq-box">
+                <div class="faq-question-btn" onclick="toggleFaq(this)">
+                    <span>How much is the security deposit and is it refundable?</span>
+                    <span class="faq-chevron">&#9662;</span>
+                </div>
+                <div class="faq-answer-body">
+                    The security deposit is equal to 1 month rent. It is <strong>100% refundable</strong> when you move out, with no hassle.
+                </div>
+            </div>
+
+            <div class="faq-box">
+                <div class="faq-question-btn" onclick="toggleFaq(this)">
+                    <span>Can I visit and see the rooms today?</span>
+                    <span class="faq-chevron">&#9662;</span>
+                </div>
+                <div class="faq-answer-body">
+                    Yes, you are always welcome! You can visit any of our PGs in Vastral, Naroda, or Rabari Colony between 9:00 AM to 8:00 PM. Just call us on <strong>9876543210</strong> before coming so our manager can show you the rooms.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Direct Contact & Owner Info -->
+    <section id="contact" style="background: var(--bg-primary); border-top: 1px solid var(--border-light);">
+        <div style="max-width: 1060px; margin: 0 auto; background: var(--bg-surface); padding: 44px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); box-shadow: var(--shadow-medium); display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <div>
+                <span class="section-eyebrow">Direct Contact</span>
+                <h3 style="font-size: 32px; margin-bottom: 12px;">Call or Visit Us Directly</h3>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px;">
+                    Have questions about room availability, prices, or need directions to our PG? Contact our manager directly. We speak Gujarati, Hindi, and English.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14px;">
+                    <div>
+                        <strong style="color: var(--text-heading);">Owner / Manager:</strong>
+                        <div style="color: var(--text-muted);">Admin &bull; Ashro Living</div>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-heading);">Direct Phone:</strong>
+                        <div><a href="tel:9876543210" style="color: var(--accent-cocoa); font-weight: 700; font-size: 16px;">+91 98765 43210</a></div>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-heading);">Email Address:</strong>
+                        <div><a href="mailto:piyush@automationwithpiyush.com" style="color: var(--accent-cocoa); font-weight: 600;">piyush@automationwithpiyush.com</a></div>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-heading);">PG Branches in Amdavad:</strong>
+                        <div style="color: var(--text-muted);">1. Vastral (SP Ring Road) &bull; 2. Naroda (Galaxy Cinema) &bull; 3. Rabari Colony (Metro Pillar 118)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <form onsubmit="handleInquirySubmit(event)">
+                    <div class="form-group">
+                        <label>Your Name *</label>
+                        <input type="text" id="inqName" required placeholder="e.g. Rahul Patel">
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Number *</label>
+                        <input type="tel" id="inqPhone" required placeholder="9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="inqEmail" placeholder="rahul@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Select PG Location</label>
+                        <select id="inqCampus">
+                            <option value="Vastral">Vastral PG (Near SP Ring Road)</option>
+                            <option value="Naroda">Naroda PG (Near Galaxy Cinema)</option>
+                            <option value="Rabari Colony">Rabari Colony PG (Near Metro)</option>
+                            <option value="CG Road (Opening Soon)">CG Road (Opening Soon)</option>
+                            <option value="Thaltej (Opening Soon)">Thaltej (Opening Soon)</option>
+                            <option value="Vastrapur (Opening Soon)">Vastrapur (Opening Soon)</option>
+                            <option value="Navrangpura (Opening Soon)">Navrangpura (Opening Soon)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Message</label>
+                        <textarea id="inqMessage" rows="3" required placeholder="Tell us your move-in date and if you need Single or Sharing room..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">Send Inquiry &rarr;</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <span class="brand-logo" style="color: var(--bg-primary);">Ashro Living</span>
+                <p>Simple, comfortable, and affordable Paying Guest (PG) living for students and young working professionals in Amdavad. Homely food, fast Wi-Fi, and clean rooms.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Our 3 PGs in Amdavad</h4>
+                <ul>
+                    <li><a href="#locations">Vastral PG (SP Ring Road)</a></li>
+                    <li><a href="#locations">Naroda PG (Galaxy Cinema)</a></li>
+                    <li><a href="#locations">Rabari Colony PG (Near Metro)</a></li>
+                    <li><a href="#facilities">Facilities Included</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Opening Soon</h4>
+                <ul>
+                    <li><a href="#upcoming">CG Road PG</a></li>
+                    <li><a href="#upcoming">Thaltej PG (SG Highway)</a></li>
+                    <li><a href="#upcoming">Vastrapur PG (Lake Area)</a></li>
+                    <li><a href="#upcoming">Navrangpura PG (University)</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Manager Contact</h4>
+                <ul>
+                    <li><a href="tel:9876543210">Call: 9876543210</a></li>
+                    <li><a href="mailto:piyush@automationwithpiyush.com">piyush@automationwithpiyush.com</a></li>
+                    <li>Amdavad, Gujarat</li>
+                    <li><a href="javascript:void(0)" onclick="openAuthModal()" style="color: var(--accent-mocha); font-weight: 600;">Sign In to Portal &rarr;</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom-line">
+            <p>&copy; 2026 Ashro Living. All rights reserved.</p>
+            <p>Ahmedabad, Gujarat &bull; Owner: Admin (9876543210)</p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Action -->
+    <a href="https://wa.me/919876543210?text=Hello%20Ashro%20Living,%20I%20want%20to%20know%20about%20PG%20rooms%20in%20Amdavad." target="_blank" rel="noopener" class="whatsapp-float">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.392-10.416c-5.514 0-10 4.486-10 10 0 1.761.458 3.418 1.258 4.869l-1.332 4.869 4.997-1.31c1.401.761 3.003 1.196 4.704 1.196 5.514 0 10-4.486 10-10s-4.486-10-10-10z"/></svg>
+        <span>WhatsApp: 9876543210</span>
+    </a>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- MODAL 1: Authentication Modal (Single Universal Login & Signup) -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card" style="max-width: 440px;">
+            <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+            <div style="text-align: center; margin-bottom: 22px;">
+                <span class="brand-logo" style="font-size: 26px;">Ashro Living</span>
+                <h3 id="authModalTitle" style="font-size: 22px; margin-top: 6px; margin-bottom: 2px;">Sign In</h3>
+                <p id="authModalSubtitle" style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Enter your email &amp; password to access your dashboard.</p>
+            </div>
+
+            <form onsubmit="handleAuthSubmit(event)" style="width: 100%;">
+                <input type="hidden" id="authMode" value="signin">
+
+                <div class="form-group" id="authNameGroup" style="display: none;">
+                    <label>Full Name *</label>
+                    <input type="text" id="authName" placeholder="e.g. Ramesh Patel">
+                </div>
+
+                <div class="form-group" id="authPhoneGroup" style="display: none;">
+                    <label>Mobile Number *</label>
+                    <input type="tel" id="authPhone" placeholder="e.g. 9876543210">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" id="authEmail" required placeholder="Enter your email address">
+                </div>
+
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="authPassword" required placeholder="Enter your password">
+                </div>
+
+                <div id="authErrorMessage" style="display: none; color: #9A3412; background: #FFEDD5; border: 1px solid #FED7AA; padding: 10px 14px; border-radius: var(--radius-xs); font-size: 12px; margin-bottom: 16px;"></div>
+
+                <button type="submit" id="authSubmitBtn" class="btn-primary" style="width: 100%; height: 46px;">
+                    Sign In &rarr;
+                </button>
+
+                <div style="text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-muted);">
+                    <span id="authSwitchPrompt">Don't have an account yet?</span>
+                    <a href="javascript:void(0)" id="authSwitchBtn" onclick="toggleAuthMode()" style="color: var(--accent-cocoa); font-weight: 700; margin-left: 4px;">Sign Up &rarr;</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Room Details Modal -->
+    <div class="modal-overlay" id="roomDetailsModal">
+        <div class="modal-card" style="max-width: 720px;">
+            <button class="modal-close" onclick="closeModal('roomDetailsModal')">&times;</button>
+            <div id="roomDetailsContent">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Schedule a Visit Modal -->
+    <div class="modal-overlay" id="visitModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('visitModal')">&times;</button>
+            <h3 style="font-size: 26px; margin-bottom: 6px;">Schedule a Visit</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px;">Come visit our PG in person and check out the rooms, food, and facilities.</p>
+
+            <form onsubmit="handleVisitSubmit(event)">
+                <div class="form-group">
+                    <label>Select PG Location in Amdavad *</label>
+                    <select id="visitPropertySelect" required>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Room Sharing Preference</label>
+                    <select id="visitRoomSelect">
+                        <option value="">Any Available Room</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Visiting Date *</label>
+                        <input type="date" id="visitDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Time *</label>
+                        <select id="visitTime">
+                            <option>10:00 AM</option>
+                            <option>11:30 AM</option>
+                            <option>02:00 PM</option>
+                            <option>04:30 PM</option>
+                            <option>06:00 PM</option>
+                            <option>07:30 PM</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Full Name *</label>
+                    <input type="text" id="visitName" required placeholder="e.g. Rahul Patel">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Mobile Number *</label>
+                        <input type="tel" id="visitPhone" required placeholder="9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="visitEmail" placeholder="rahul@example.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Any Questions / Special Request</label>
+                    <input type="text" id="visitNotes" placeholder="e.g. Looking for ground floor room or bike parking">
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 6px;">
+                    Confirm Visit &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Instant Room Booking Modal -->
+    <div class="modal-overlay" id="reserveModal">
+        <div class="modal-card" style="max-width: 600px;">
+            <button class="modal-close" onclick="closeModal('reserveModal')">&times;</button>
+            <h3 style="font-size: 26px; margin-bottom: 6px;">Book Your PG Room</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Lock your bed with zero brokerage. We will keep your room ready on your move-in date.</p>
+
+            <div id="reserveSummaryCard" style="background: var(--bg-primary); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-light);"></div>
+
+            <form onsubmit="handleReserveSubmit(event)">
+                <input type="hidden" id="reserveRoomId">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Move-in Date *</label>
+                        <input type="date" id="reserveMoveInDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stay Duration *</label>
+                        <select id="reserveTenure" onchange="updateReservePricing()">
+                            <option value="1">1 Month (Flexible)</option>
+                            <option value="3">3 Months</option>
+                            <option value="6" selected>6 Months (Save ₹1,000 every month)</option>
+                            <option value="11">11 Months (Full Year)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Full Name *</label>
+                    <input type="text" id="reserveGuestName" required placeholder="e.g. Aarav Sharma">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Mobile Number *</label>
+                        <input type="tel" id="reserveGuestPhone" required placeholder="9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="reserveGuestEmail" placeholder="aarav@example.com">
+                    </div>
+                </div>
+
+                <div id="reservePriceBreakdown" style="background: var(--sand-glow); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px;"></div>
+
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    Pay ₹2,000 Advance Token &amp; Confirm Room &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
