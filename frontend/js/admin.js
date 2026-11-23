@@ -545,9 +545,9 @@ function renderKycTable() {
                 </td>
                 <td>
                     <div class="kyc-thumb-strip">
-                        ${k.id_front_image ? `<img src="${k.id_front_image}" alt="Front" class="kyc-thumb-mini" title="Govt ID Front" onclick="openAdminDocPreview('${k.id_front_image.replace(/'/g, "\\'")}', '${k.user_name} - ID Front')">` : '<span style="font-size: 10px; color: var(--text-muted);">No Front</span>'}
-                        ${k.id_back_image ? `<img src="${k.id_back_image}" alt="Back" class="kyc-thumb-mini" title="Address Back" onclick="openAdminDocPreview('${k.id_back_image.replace(/'/g, "\\'")}', '${k.user_name} - Address Back')">` : ''}
-                        ${k.work_id_image ? `<img src="${k.work_id_image}" alt="Work ID" class="kyc-thumb-mini" title="Work / Student Proof" onclick="openAdminDocPreview('${k.work_id_image.replace(/'/g, "\\'")}', '${k.user_name} - Work/Student ID')">` : ''}
+                        ${k.id_front_image ? `<img src="${k.id_front_image}" alt="Front" class="kyc-thumb-mini" title="Govt ID Front" onclick="openAdminDocPreviewById(${k.id}, 'id_front')">` : '<span style="font-size: 10px; color: var(--text-muted);">No Front</span>'}
+                        ${k.id_back_image ? `<img src="${k.id_back_image}" alt="Back" class="kyc-thumb-mini" title="Address Back" onclick="openAdminDocPreviewById(${k.id}, 'id_back')">` : ''}
+                        ${k.work_id_image ? `<img src="${k.work_id_image}" alt="Work ID" class="kyc-thumb-mini" title="Work / Student Proof" onclick="openAdminDocPreviewById(${k.id}, 'work_id')">` : ''}
                     </div>
                 </td>
                 <td>
@@ -624,19 +624,19 @@ function openKycReviewModal(kycId) {
         docsGrid.innerHTML = `
             <div class="kyc-doc-card-modal">
                 <strong style="display: block; font-size: 12px; margin-bottom: 6px;">1. ${kyc.id_type} (Front Side)</strong>
-                ${kyc.id_front_image ? `<img src="${kyc.id_front_image}" alt="ID Front" onclick="openAdminDocPreview('${kyc.id_front_image.replace(/'/g, "\\'")}', '${kyc.user_name} - ${kyc.id_type} Front')">` : '<div style="padding: 40px; color: var(--text-muted);">No image uploaded</div>'}
+                ${kyc.id_front_image ? `<img src="${kyc.id_front_image}" alt="ID Front" onclick="openAdminDocPreviewById(${kyc.id}, 'id_front')">` : '<div style="padding: 40px; color: var(--text-muted);">No image uploaded</div>'}
                 <div style="font-size: 11px; color: var(--text-muted);">Click to zoom full size</div>
             </div>
 
             <div class="kyc-doc-card-modal">
                 <strong style="display: block; font-size: 12px; margin-bottom: 6px;">2. Permanent Address (Back Side)</strong>
-                ${kyc.id_back_image ? `<img src="${kyc.id_back_image}" alt="ID Back" onclick="openAdminDocPreview('${kyc.id_back_image.replace(/'/g, "\\'")}', '${kyc.user_name} - Address Back')">` : '<div style="padding: 40px; color: var(--text-muted);">No back image</div>'}
+                ${kyc.id_back_image ? `<img src="${kyc.id_back_image}" alt="ID Back" onclick="openAdminDocPreviewById(${kyc.id}, 'id_back')">` : '<div style="padding: 40px; color: var(--text-muted);">No back image</div>'}
                 <div style="font-size: 11px; color: var(--text-muted);">Click to zoom full size</div>
             </div>
 
             <div class="kyc-doc-card-modal">
                 <strong style="display: block; font-size: 12px; margin-bottom: 6px;">3. Work / College ID Proof</strong>
-                ${kyc.work_id_image ? `<img src="${kyc.work_id_image}" alt="Work ID" onclick="openAdminDocPreview('${kyc.work_id_image.replace(/'/g, "\\'")}', '${kyc.user_name} - Work / College ID')">` : '<div style="padding: 40px; color: var(--text-muted);">No work ID provided</div>'}
+                ${kyc.work_id_image ? `<img src="${kyc.work_id_image}" alt="Work ID" onclick="openAdminDocPreviewById(${kyc.id}, 'work_id')">` : '<div style="padding: 40px; color: var(--text-muted);">No work ID provided</div>'}
                 <div style="font-size: 11px; color: var(--text-muted);">Click to zoom full size</div>
             </div>
         `;
@@ -688,6 +688,26 @@ async function promptKycRejection() {
         renderStats();
     } catch (err) {
         showToast(err.message || 'Failed to update KYC status', 'error');
+    }
+}
+
+function openAdminDocPreviewById(kycId, docType) {
+    const kyc = (adminState.kyc || []).find(k => k.id === kycId);
+    if (!kyc) return;
+    let src = '';
+    let title = '';
+    if (docType === 'id_front') {
+        src = kyc.id_front_image;
+        title = `${kyc.user_name} — ${kyc.id_type || 'ID Card'} (Front)`;
+    } else if (docType === 'id_back') {
+        src = kyc.id_back_image;
+        title = `${kyc.user_name} — Permanent Address (Back)`;
+    } else if (docType === 'work_id') {
+        src = kyc.work_id_image;
+        title = `${kyc.user_name} — Work / Student Proof`;
+    }
+    if (src) {
+        openAdminDocPreview(src, title);
     }
 }
 

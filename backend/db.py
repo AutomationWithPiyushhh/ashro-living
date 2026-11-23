@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import base64
 from contextlib import contextmanager
 from backend.config import DB_PATH, DATA_DIR
 
@@ -242,9 +243,35 @@ def get_db():
     finally:
         conn.close()
 
+def sanitize_legacy_svg_records(conn):
+    """
+    Safely migrates legacy unencoded SVG data strings into clean base64 data URLs
+    so they cannot terminate HTML attributes or break image previewing.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, id_front_image, id_back_image, work_id_image FROM kyc_records;")
+        rows = cursor.fetchall()
+        for row in rows:
+            updates = {}
+            for col in ['id_front_image', 'id_back_image', 'work_id_image']:
+                val = row[col]
+                if val and val.startswith("data:image/svg+xml;utf8,"):
+                    raw_svg = val[len("data:image/svg+xml;utf8,"):]
+                    b64 = "data:image/svg+xml;base64," + base64.b64encode(raw_svg.encode("utf-8")).decode("utf-8")
+                    updates[col] = b64
+            if updates:
+                set_clause = ", ".join([f"{k} = ?" for k in updates.keys()])
+                params = list(updates.values()) + [row['id']]
+                cursor.execute(f"UPDATE kyc_records SET {set_clause} WHERE id = ?;", params)
+    except Exception as e:
+        # Table might not exist yet during fresh install
+        pass
+
 def init_db():
     with get_db() as conn:
         conn.executescript(SCHEMA_SQL)
+        sanitize_legacy_svg_records(conn)
     print("Database initialized successfully at", DB_PATH)
 
 if __name__ == "__main__":

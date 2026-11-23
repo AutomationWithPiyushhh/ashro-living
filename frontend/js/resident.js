@@ -609,49 +609,53 @@ async function handleKycFormSubmit(e) {
 }
 
 function loadSampleKycDocs() {
-    const sampleFront = (
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
-        + '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
-        + '<rect width="400" height="35" fill="%23302720"/>'
-        + '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">GOVERNMENT OF INDIA • AADHAAR CARD</text>'
-        + '<rect x="25" y="55" width="80" height="100" fill="%23E8DED1" rx="4"/>'
-        + '<circle cx="65" cy="90" r="25" fill="%23B69B83"/>'
-        + '<path d="M40 140 C40 115 90 115 90 140 Z" fill="%23B69B83"/>'
-        + '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="%23302720">NAME: AARAV SHARMA</text>'
-        + '<text x="125" y="98" font-family="sans-serif" font-size="11" fill="%23756D65">DOB: 14/08/1998 • Gender: Male</text>'
-        + '<text x="125" y="125" font-family="sans-serif" font-size="14" font-weight="bold" fill="%23765B49">5421 8901 8241</text>'
-        + '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
-        + '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Mera Aadhaar, Meri Pehchaan • Sample ID</text></svg>'
+    function makeSampleSvgUrl(svg) {
+        return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg.trim())));
+    }
+
+    const sampleFront = makeSampleSvgUrl(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+        + '<rect width="400" height="250" fill="#FFFFFF" rx="8" stroke="#DED5C9" stroke-width="2"/>'
+        + '<rect width="400" height="35" fill="#302720"/>'
+        + '<text x="20" y="23" fill="#FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">GOVERNMENT OF INDIA • AADHAAR CARD</text>'
+        + '<rect x="25" y="55" width="80" height="100" fill="#E8DED1" rx="4"/>'
+        + '<circle cx="65" cy="90" r="25" fill="#B69B83"/>'
+        + '<path d="M40 140 C40 115 90 115 90 140 Z" fill="#B69B83"/>'
+        + '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="#302720">NAME: AARAV SHARMA</text>'
+        + '<text x="125" y="98" font-family="sans-serif" font-size="11" fill="#756D65">DOB: 14/08/1998 • Gender: Male</text>'
+        + '<text x="125" y="125" font-family="sans-serif" font-size="14" font-weight="bold" fill="#765B49">5421 8901 8241</text>'
+        + '<rect x="0" y="220" width="400" height="30" fill="#F7F3ED"/>'
+        + '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="#756D65">Mera Aadhaar, Meri Pehchaan • Sample ID</text></svg>'
     );
 
-    const sampleBack = (
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
-        + '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
-        + '<rect width="400" height="35" fill="%23302720"/>'
-        + '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">UNIQUE IDENTIFICATION AUTHORITY OF INDIA</text>'
-        + '<text x="25" y="70" font-family="sans-serif" font-size="11" font-weight="bold" fill="%23302720">Permanent Address:</text>'
-        + '<text x="25" y="92" font-family="sans-serif" font-size="11" fill="%23756D65">B-402, Shivalik Residency, 150 Feet Ring Road</text>'
-        + '<text x="25" y="112" font-family="sans-serif" font-size="11" fill="%23756D65">Rajkot, Gujarat - 360005</text>'
-        + '<rect x="25" y="145" width="350" height="40" fill="%23E8DED1" rx="4"/>'
-        + '<text x="40" y="170" font-family="monospace" font-size="11" fill="%23302720">||| | ||||| || |||||| | |||| ||| ||||</text>'
-        + '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
-        + '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Official Address Proof • Sample Back</text></svg>'
+    const sampleBack = makeSampleSvgUrl(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+        + '<rect width="400" height="250" fill="#FFFFFF" rx="8" stroke="#DED5C9" stroke-width="2"/>'
+        + '<rect width="400" height="35" fill="#302720"/>'
+        + '<text x="20" y="23" fill="#FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">UNIQUE IDENTIFICATION AUTHORITY OF INDIA</text>'
+        + '<text x="25" y="70" font-family="sans-serif" font-size="11" font-weight="bold" fill="#302720">Permanent Address:</text>'
+        + '<text x="25" y="92" font-family="sans-serif" font-size="11" fill="#756D65">B-402, Shivalik Residency, 150 Feet Ring Road</text>'
+        + '<text x="25" y="112" font-family="sans-serif" font-size="11" fill="#756D65">Rajkot, Gujarat - 360005</text>'
+        + '<rect x="25" y="145" width="350" height="40" fill="#E8DED1" rx="4"/>'
+        + '<text x="40" y="170" font-family="monospace" font-size="11" fill="#302720">||| | ||||| || |||||| | |||| ||| ||||</text>'
+        + '<rect x="0" y="220" width="400" height="30" fill="#F7F3ED"/>'
+        + '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="#756D65">Official Address Proof • Sample Back</text></svg>'
     );
 
-    const sampleWork = (
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
-        + '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
-        + '<rect width="400" height="35" fill="%23765B49"/>'
-        + '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">EMPLOYEE ID • TATA CONSULTANCY SERVICES</text>'
-        + '<rect x="25" y="55" width="80" height="100" fill="%23E8DED1" rx="4"/>'
-        + '<circle cx="65" cy="90" r="25" fill="%23B69B83"/>'
-        + '<path d="M40 140 C40 115 90 115 90 140 Z" fill="%23B69B83"/>'
-        + '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="%23302720">AARAV SHARMA</text>'
-        + '<text x="125" y="95" font-family="sans-serif" font-size="11" fill="%23756D65">Designation: Systems Engineer</text>'
-        + '<text x="125" y="115" font-family="sans-serif" font-size="11" fill="%23756D65">Emp ID: TCS-748921</text>'
-        + '<text x="125" y="135" font-family="sans-serif" font-size="11" fill="%23756D65">Campus: Infocity, Gandhinagar</text>'
-        + '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
-        + '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Corporate Employment Verification Card</text></svg>'
+    const sampleWork = makeSampleSvgUrl(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+        + '<rect width="400" height="250" fill="#FFFFFF" rx="8" stroke="#DED5C9" stroke-width="2"/>'
+        + '<rect width="400" height="35" fill="#765B49"/>'
+        + '<text x="20" y="23" fill="#FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">EMPLOYEE ID • TATA CONSULTANCY SERVICES</text>'
+        + '<rect x="25" y="55" width="80" height="100" fill="#E8DED1" rx="4"/>'
+        + '<circle cx="65" cy="90" r="25" fill="#B69B83"/>'
+        + '<path d="M40 140 C40 115 90 115 90 140 Z" fill="#B69B83"/>'
+        + '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="#302720">AARAV SHARMA</text>'
+        + '<text x="125" y="95" font-family="sans-serif" font-size="11" fill="#756D65">Designation: Systems Engineer</text>'
+        + '<text x="125" y="115" font-family="sans-serif" font-size="11" fill="#756D65">Emp ID: TCS-748921</text>'
+        + '<text x="125" y="135" font-family="sans-serif" font-size="11" fill="#756D65">Campus: Infocity, Gandhinagar</text>'
+        + '<rect x="0" y="220" width="400" height="30" fill="#F7F3ED"/>'
+        + '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="#756D65">Corporate Employment Verification Card</text></svg>'
     );
 
     residentState.pendingDocs.id_front = sampleFront;

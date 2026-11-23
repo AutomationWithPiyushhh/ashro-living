@@ -189,17 +189,22 @@
 
 /* KYC Review Specifics */
 .kyc-thumb-strip {
-    display: flex;
+    display: inline-flex;
     gap: 6px;
     align-items: center;
+    white-space: nowrap;
 }
 .kyc-thumb-mini {
     width: 44px;
     height: 32px;
+    min-width: 44px;
+    max-width: 44px;
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid var(--border-light);
     cursor: pointer;
+    background: #FFF;
+    display: inline-block;
     transition: transform 0.15s ease;
 }
 .kyc-thumb-mini:hover {

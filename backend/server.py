@@ -5,6 +5,7 @@ import re
 from urllib.parse import urlparse, parse_qs
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from backend.config import HOST, PORT, FRONTEND_DIR
+from backend.db import init_db
 import backend.models as models
 import backend.notifications as notifications
 
@@ -479,6 +480,11 @@ class AshroLivingHandler(BaseHTTPRequestHandler):
                 pass
 
 def run_server():
+    try:
+        init_db()
+    except Exception as e:
+        print("Note: DB initialization error during server start:", e)
+
     server_address = (HOST, PORT)
     ThreadingHTTPServer.allow_reuse_address = True
     httpd = ThreadingHTTPServer(server_address, AshroLivingHandler)
