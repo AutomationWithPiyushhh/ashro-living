@@ -50,6 +50,7 @@
             <div class="admin-tab-item" data-tab="visits" onclick="switchAdminTab('visits', this)">Visit Schedules <span class="pill-count" id="badgeVisits">0</span></div>
             <div class="admin-tab-item" data-tab="tickets" onclick="switchAdminTab('tickets', this)">Complaints &amp; Maintenance <span class="pill-count" id="badgeTickets">0</span></div>
             <div class="admin-tab-item" data-tab="bookings" onclick="switchAdminTab('bookings', this)">Bookings &amp; Residents</div>
+            <div class="admin-tab-item" data-tab="kyc" onclick="switchAdminTab('kyc', this)">Tenant KYC <span class="pill-count" id="badgeKyc" style="background: var(--accent-cocoa); color: white;">0</span></div>
         </div>
 
         <div class="admin-body-wrap">
@@ -88,6 +89,14 @@
                         </div>
                         <div class="kpi-tile-value" id="kpiTickets">0</div>
                         <span class="kpi-tile-sub">Pending caretaker action</span>
+                    </div>
+
+                    <div class="kpi-tile" onclick="switchAdminTab('kyc')" style="cursor: pointer;">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-title">Pending Tenant KYC</span>
+                        </div>
+                        <div class="kpi-tile-value" id="kpiKyc" style="color: var(--accent-cocoa);">0</div>
+                        <span class="kpi-tile-sub">Awaiting admin review</span>
                     </div>
                 </div>
 
@@ -246,6 +255,43 @@
                 </div>
             </div>
 
+            <!-- TAB 6: Tenant KYC & Verification Desk -->
+            <div class="tab-pane" id="admin-tab-kyc">
+                <div class="admin-action-row">
+                    <div>
+                        <h3 style="font-size: 24px;">Tenant Digital KYC &amp; Verification Desk</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Review government ID proofs, student/work credentials, and permanent residence records.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-secondary active" onclick="filterKycTable('all', this)" style="padding: 6px 12px; font-size: 11px;">All Records</button>
+                        <button class="btn-secondary" onclick="filterKycTable('Under Review', this)" style="padding: 6px 12px; font-size: 11px;">Under Review</button>
+                        <button class="btn-secondary" onclick="filterKycTable('Verified', this)" style="padding: 6px 12px; font-size: 11px;">Verified</button>
+                        <button class="btn-secondary" onclick="filterKycTable('Rejected', this)" style="padding: 6px 12px; font-size: 11px;">Needs Re-upload</button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-data-table">
+                        <thead>
+                            <tr>
+                                <th>Resident Name</th>
+                                <th>Contact Details</th>
+                                <th>PG Campus &amp; Suite</th>
+                                <th>Govt ID Proof</th>
+                                <th>Occupation / Firm</th>
+                                <th>Uploaded Docs</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminKycTableBody">
+                            <tr><td colspan="9" style="text-align: center; padding: 20px;">Loading KYC submissions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -369,6 +415,52 @@
                 </div>
                 <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Sign In as Manager &rarr;</button>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: KYC Review & Approval Modal -->
+    <div class="modal-overlay" id="kycReviewModal">
+        <div class="modal-card" style="max-width: 760px;">
+            <button class="modal-close" onclick="closeModal('kycReviewModal')">&times;</button>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
+                <div>
+                    <h3 style="font-size: 24px; margin-bottom: 4px;">Tenant KYC Verification Review</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Inspect uploaded documents and confirm tenant identity.</p>
+                </div>
+                <span id="modalKycStatusBadge" class="doc-badge-status review">Under Review</span>
+            </div>
+
+            <!-- Resident Summary Banner -->
+            <div id="modalKycResidentSummary" style="background: var(--bg-primary); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); margin-bottom: 20px;"></div>
+
+            <!-- Documents View Grid -->
+            <h4 style="font-size: 16px; margin-bottom: 8px; color: var(--text-heading);">Uploaded Verification Documents</h4>
+            <div id="modalKycDocsGrid" class="kyc-docs-grid-modal"></div>
+
+            <!-- Decision Row -->
+            <div style="border-top: 1px solid var(--border-light); padding-top: 18px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <button type="button" class="btn-secondary" onclick="closeModal('kycReviewModal')">Close</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-secondary" style="color: #C0392B; border-color: #E74C3C;" onclick="promptKycRejection()">
+                        ✕ Request Re-Upload
+                    </button>
+                    <button type="button" class="btn-primary" style="background: #2E7D32; border-color: #2E7D32;" onclick="confirmKycApproval()">
+                        ✓ Approve &amp; Verify Tenant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: Document Image Full Lightbox -->
+    <div class="modal-overlay" id="adminDocViewerModal">
+        <div class="modal-card" style="max-width: 680px; text-align: center;">
+            <button class="modal-close" onclick="closeModal('adminDocViewerModal')">&times;</button>
+            <h3 id="adminDocViewerTitle" style="font-size: 20px; margin-bottom: 12px;">Document Preview</h3>
+            <div style="background: #F7F3ED; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
+                <img id="adminDocViewerImg" src="" alt="Full Document" style="max-width: 100%; max-height: 480px; object-fit: contain; border-radius: 4px;">
+            </div>
+            <button class="btn-secondary" onclick="closeModal('adminDocViewerModal')">Close</button>
         </div>
     </div>
 

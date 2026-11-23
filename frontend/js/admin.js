@@ -6,7 +6,10 @@ let adminState = {
     rooms: [],
     visits: [],
     tickets: [],
-    bookings: []
+    bookings: [],
+    kyc: [],
+    activeKycFilter: 'all',
+    currentReviewKycId: null
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -73,13 +76,14 @@ function switchAdminTab(tabName, clickedEl) {
 
 async function loadAdminData() {
     try {
-        const [stats, props, rooms, visits, tickets, bookings] = await Promise.all([
+        const [stats, props, rooms, visits, tickets, bookings, kyc] = await Promise.all([
             AshroAPI.get('/admin/stats'),
             AshroAPI.get('/properties'),
             AshroAPI.get('/rooms'),
             AshroAPI.get('/admin/visits'),
             AshroAPI.get('/admin/tickets'),
-            AshroAPI.get('/admin/bookings')
+            AshroAPI.get('/admin/bookings'),
+            AshroAPI.get('/admin/kyc').catch(() => [])
         ]);
 
         adminState.stats = stats;
@@ -88,12 +92,14 @@ async function loadAdminData() {
         adminState.visits = visits;
         adminState.tickets = tickets;
         adminState.bookings = bookings;
+        adminState.kyc = kyc || [];
 
         renderStats();
         renderRoomsTable();
         renderVisitsTable();
         renderTicketsTable();
         renderBookingsTable();
+        renderKycTable();
         populateNewRoomProps();
     } catch (err) {
         console.error('Failed to load manager hub data:', err);
@@ -124,6 +130,13 @@ function renderStats() {
 
     const badgeTickets = document.getElementById('badgeTickets');
     if (badgeTickets) badgeTickets.textContent = s.open_tickets;
+
+    const badgeKyc = document.getElementById('badgeKyc');
+    const pendingKycCount = adminState.kyc.filter(k => k.status === 'Under Review').length;
+    if (badgeKyc) badgeKyc.textContent = pendingKycCount;
+
+    const kpiKyc = document.getElementById('kpiKyc');
+    if (kpiKyc) kpiKyc.textContent = pendingKycCount;
 
     const recTbody = document.getElementById('overviewBookingsTable');
     if (recTbody) {
@@ -358,10 +371,25 @@ function renderBookingsTable() {
         return;
     }
 
-    tbody.innerHTML = adminState.bookings.map(b => `
+    tbody.innerHTML = adminState.bookings.map(b => {
+        const kycRecord = (adminState.kyc || []).find(k => k.user_id === b.user_id || k.user_email === b.guest_email);
+        const kycStatus = kycRecord ? kycRecord.status : 'Pending';
+        let kycBadge = '<span class="doc-badge-status pending" style="cursor: pointer;" onclick="switchAdminTab(\'kyc\')">KYC: Pending</span>';
+        if (kycStatus === 'Verified') {
+            kycBadge = '<span class="doc-badge-status verified" style="cursor: pointer;" onclick="switchAdminTab(\'kyc\')">✓ KYC Verified</span>';
+        } else if (kycStatus === 'Under Review') {
+            kycBadge = '<span class="doc-badge-status review" style="cursor: pointer;" onclick="switchAdminTab(\'kyc\')">⏳ KYC Review</span>';
+        } else if (kycStatus === 'Rejected') {
+            kycBadge = '<span class="doc-badge-status rejected" style="cursor: pointer;" onclick="switchAdminTab(\'kyc\')">✕ KYC Re-upload</span>';
+        }
+
+        return `
         <tr>
             <td><strong>${b.booking_reference}</strong></td>
-            <td><strong>${b.guest_name}</strong></td>
+            <td>
+                <strong>${b.guest_name}</strong>
+                <div style="margin-top: 4px;">${kycBadge}</div>
+            </td>
             <td>
                 <div>${b.guest_phone}</div>
                 <div style="font-size: 11px; color: var(--text-muted);">${b.guest_email}</div>
@@ -376,7 +404,8 @@ function renderBookingsTable() {
             <td>${formatINR(b.security_deposit)}</td>
             <td><span class="status-badge paid">${b.status}</span></td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function populateNewRoomProps() {
@@ -457,4 +486,216 @@ async function handleAdminPageLogin(e) {
 function closeModal(id) {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
+}
+
+// ================= Tenant Digital KYC Controller =================
+function renderKycTable() {
+    const tbody = document.getElementById('adminKycTableBody');
+    if (!tbody) return;
+
+    let records = adminState.kyc || [];
+    if (adminState.activeKycFilter !== 'all') {
+        records = records.filter(k => k.status === adminState.activeKycFilter);
+    }
+
+    if (!records.length) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">No tenant KYC records found matching filter.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = records.map(k => {
+        let statusBadge = '<span class="doc-badge-status review">Under Review</span>';
+        if (k.status === 'Verified') {
+            statusBadge = '<span class="doc-badge-status verified">✓ Verified</span>';
+        } else if (k.status === 'Rejected') {
+            statusBadge = '<span class="doc-badge-status rejected">✕ Needs Re-upload</span>';
+        } else if (k.status === 'Pending Submission') {
+            statusBadge = '<span class="doc-badge-status pending">Pending</span>';
+        }
+
+        const cleanPhone = (k.user_phone || '').replace(/[^0-9]/g, '');
+
+        return `
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${k.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}" alt="${k.user_name}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                            <strong>${k.user_name}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">UID: #${k.user_id}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div><a href="tel:${k.user_phone}" style="color: var(--text-heading); font-weight: 600; text-decoration: none;">${k.user_phone}</a></div>
+                    <div style="font-size: 11px; color: var(--text-muted);">${k.user_email}</div>
+                    ${cleanPhone ? `<div style="margin-top: 2px;"><a href="https://wa.me/91${cleanPhone}" target="_blank" style="color: #25D366; font-size: 11px; text-decoration: none; font-weight: bold;">WhatsApp &rarr;</a></div>` : ''}
+                </td>
+                <td>
+                    <strong>${k.room_name || 'Allocated Room'}</strong>
+                    <div style="font-size: 11px; color: var(--accent-cocoa);">${k.property_name || 'Amdavad PG'}</div>
+                </td>
+                <td>
+                    <strong>${k.id_type || 'Aadhaar Card'}</strong>
+                    <div style="font-size: 11px; font-family: monospace; color: var(--text-muted);">${k.id_number || 'Not Provided'}</div>
+                </td>
+                <td>
+                    <div style="font-weight: 600;">${k.occupation_type || 'Professional'}</div>
+                    <div style="font-size: 11px; color: var(--text-muted); max-width: 180px;">${k.institution_name || 'General Resident'}</div>
+                </td>
+                <td>
+                    <div class="kyc-thumb-strip">
+                        ${k.id_front_image ? `<img src="${k.id_front_image}" alt="Front" class="kyc-thumb-mini" title="Govt ID Front" onclick="openAdminDocPreview('${k.id_front_image.replace(/'/g, "\\'")}', '${k.user_name} - ID Front')">` : '<span style="font-size: 10px; color: var(--text-muted);">No Front</span>'}
+                        ${k.id_back_image ? `<img src="${k.id_back_image}" alt="Back" class="kyc-thumb-mini" title="Address Back" onclick="openAdminDocPreview('${k.id_back_image.replace(/'/g, "\\'")}', '${k.user_name} - Address Back')">` : ''}
+                        ${k.work_id_image ? `<img src="${k.work_id_image}" alt="Work ID" class="kyc-thumb-mini" title="Work / Student Proof" onclick="openAdminDocPreview('${k.work_id_image.replace(/'/g, "\\'")}', '${k.user_name} - Work/Student ID')">` : ''}
+                    </div>
+                </td>
+                <td>
+                    <span style="font-size: 11px; color: var(--text-muted);">${k.updated_at ? k.updated_at.split(' ')[0] : (k.submitted_at ? k.submitted_at.split(' ')[0] : 'Recent')}</span>
+                </td>
+                <td>
+                    ${statusBadge}
+                </td>
+                <td>
+                    <button class="btn-primary" style="padding: 5px 12px; font-size: 11px;" onclick="openKycReviewModal(${k.id})">
+                        Review &amp; Verify &rarr;
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function filterKycTable(status, btnEl) {
+    adminState.activeKycFilter = status;
+    document.querySelectorAll('#admin-tab-kyc .btn-secondary').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    renderKycTable();
+}
+
+function openKycReviewModal(kycId) {
+    const kyc = adminState.kyc.find(k => k.id === kycId);
+    if (!kyc) return;
+
+    adminState.currentReviewKycId = kycId;
+
+    // Status Badge
+    const badgeEl = document.getElementById('modalKycStatusBadge');
+    if (badgeEl) {
+        badgeEl.className = 'doc-badge-status';
+        if (kyc.status === 'Verified') {
+            badgeEl.classList.add('verified'); badgeEl.textContent = 'Verified Resident';
+        } else if (kyc.status === 'Rejected') {
+            badgeEl.classList.add('rejected'); badgeEl.textContent = 'Rejected';
+        } else {
+            badgeEl.classList.add('review'); badgeEl.textContent = 'Under Review';
+        }
+    }
+
+    // Resident Summary
+    const summaryBox = document.getElementById('modalKycResidentSummary');
+    if (summaryBox) {
+        summaryBox.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <img src="${kyc.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <h4 style="font-size: 18px; margin: 0 0 2px 0;">${kyc.user_name}</h4>
+                        <div style="font-size: 12px; color: var(--text-muted);">${kyc.user_email} &bull; ${kyc.user_phone}</div>
+                        <div style="font-size: 12px; color: var(--accent-cocoa); font-weight: 600; margin-top: 2px;">
+                            ${kyc.property_name || 'Ashro Living'} &bull; ${kyc.room_name || 'Allocated Suite'}
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; line-height: 1.6; max-width: 300px;">
+                    <div><strong>Govt ID:</strong> ${kyc.id_type} (${kyc.id_number || 'N/A'})</div>
+                    <div><strong>Occupation:</strong> ${kyc.occupation_type} at ${kyc.institution_name || 'N/A'}</div>
+                    <div><strong>Permanent City:</strong> ${kyc.city || ''}, ${kyc.state || 'Gujarat'} (${kyc.pincode || ''})</div>
+                    <div><strong>Emergency Guardian:</strong> ${kyc.emergency_name || 'N/A'} (${kyc.emergency_relation || 'Parent'}) &bull; ${kyc.emergency_phone || 'N/A'}</div>
+                </div>
+            </div>
+            ${kyc.rejection_reason ? `<div style="margin-top: 10px; padding: 8px 12px; background: #FDEDEC; border-radius: 4px; font-size: 12px; color: #78281F;"><strong>Previous Rejection Reason:</strong> ${kyc.rejection_reason}</div>` : ''}
+        `;
+    }
+
+    // Documents Grid
+    const docsGrid = document.getElementById('modalKycDocsGrid');
+    if (docsGrid) {
+        docsGrid.innerHTML = `
+            <div class="kyc-doc-card-modal">
+                <strong style="display: block; font-size: 12px; margin-bottom: 6px;">1. ${kyc.id_type} (Front Side)</strong>
+                ${kyc.id_front_image ? `<img src="${kyc.id_front_image}" alt="ID Front" onclick="openAdminDocPreview('${kyc.id_front_image.replace(/'/g, "\\'")}', '${kyc.user_name} - ${kyc.id_type} Front')">` : '<div style="padding: 40px; color: var(--text-muted);">No image uploaded</div>'}
+                <div style="font-size: 11px; color: var(--text-muted);">Click to zoom full size</div>
+            </div>
+
+            <div class="kyc-doc-card-modal">
+                <strong style="display: block; font-size: 12px; margin-bottom: 6px;">2. Permanent Address (Back Side)</strong>
+                ${kyc.id_back_image ? `<img src="${kyc.id_back_image}" alt="ID Back" onclick="openAdminDocPreview('${kyc.id_back_image.replace(/'/g, "\\'")}', '${kyc.user_name} - Address Back')">` : '<div style="padding: 40px; color: var(--text-muted);">No back image</div>'}
+                <div style="font-size: 11px; color: var(--text-muted);">Click to zoom full size</div>
+            </div>
+
+            <div class="kyc-doc-card-modal">
+                <strong style="display: block; font-size: 12px; margin-bottom: 6px;">3. Work / College ID Proof</strong>
+                ${kyc.work_id_image ? `<img src="${kyc.work_id_image}" alt="Work ID" onclick="openAdminDocPreview('${kyc.work_id_image.replace(/'/g, "\\'")}', '${kyc.user_name} - Work / College ID')">` : '<div style="padding: 40px; color: var(--text-muted);">No work ID provided</div>'}
+                <div style="font-size: 11px; color: var(--text-muted);">Click to zoom full size</div>
+            </div>
+        `;
+    }
+
+    document.getElementById('kycReviewModal').classList.add('active');
+}
+
+async function confirmKycApproval() {
+    if (!adminState.currentReviewKycId) return;
+    try {
+        await AshroAPI.put(`/admin/kyc/${adminState.currentReviewKycId}`, { status: 'Verified' });
+        showToast('Tenant KYC verified and approved successfully!', 'success');
+        closeModal('kycReviewModal');
+
+        const [kyc, stats] = await Promise.all([
+            AshroAPI.get('/admin/kyc'),
+            AshroAPI.get('/admin/stats')
+        ]);
+        adminState.kyc = kyc;
+        adminState.stats = stats;
+        renderKycTable();
+        renderStats();
+    } catch (err) {
+        showToast(err.message || 'Failed to approve KYC', 'error');
+    }
+}
+
+async function promptKycRejection() {
+    if (!adminState.currentReviewKycId) return;
+    const reason = prompt('Please specify why this document needs re-upload:', 'Aadhaar image is blurry or address proof incomplete.');
+    if (!reason) return;
+
+    try {
+        await AshroAPI.put(`/admin/kyc/${adminState.currentReviewKycId}`, {
+            status: 'Rejected',
+            rejection_reason: reason
+        });
+        showToast('Re-upload request sent to resident', 'success');
+        closeModal('kycReviewModal');
+
+        const [kyc, stats] = await Promise.all([
+            AshroAPI.get('/admin/kyc'),
+            AshroAPI.get('/admin/stats')
+        ]);
+        adminState.kyc = kyc;
+        adminState.stats = stats;
+        renderKycTable();
+        renderStats();
+    } catch (err) {
+        showToast(err.message || 'Failed to update KYC status', 'error');
+    }
+}
+
+function openAdminDocPreview(imgSrc, title) {
+    const modalImg = document.getElementById('adminDocViewerImg');
+    const modalTitle = document.getElementById('adminDocViewerTitle');
+    if (modalImg) modalImg.src = imgSrc;
+    if (modalTitle) modalTitle.textContent = title || 'Document Inspection';
+
+    document.getElementById('adminDocViewerModal').classList.add('active');
 }

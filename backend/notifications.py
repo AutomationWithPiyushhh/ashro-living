@@ -236,3 +236,58 @@ def notify_admin_visit(visit, async_mode=True):
     else:
         _worker()
         return None
+
+
+def notify_admin_kyc(kyc_record, async_mode=True):
+    """
+    Alerts admin when a resident submits/updates their KYC documents for verification.
+    """
+    def _worker():
+        name = kyc_record.get('user_name') or 'Resident'
+        phone = kyc_record.get('user_phone') or 'N/A'
+        email = kyc_record.get('user_email') or 'N/A'
+        id_type = kyc_record.get('id_type') or 'Govt ID'
+        id_num = kyc_record.get('id_number') or 'N/A'
+        occ = kyc_record.get('occupation_type') or 'N/A'
+        inst = kyc_record.get('institution_name') or ''
+        prop = kyc_record.get('property_name') or 'Ashro Living Campus'
+
+        print("\n" + "=" * 65)
+        print("🪪  [ADMIN ALERT] NEW TENANT KYC SUBMITTED FOR REVIEW")
+        print(f"• Resident:     {name} ({phone})")
+        print(f"• PG Campus:    {prop}")
+        print(f"• Document:     {id_type} ({id_num})")
+        print(f"• Occupation:   {occ} {f'({inst})' if inst else ''}")
+        print("=" * 65 + "\n")
+
+        # Telegram
+        if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
+            try:
+                url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+                text = (
+                    f"🪪 *Ashro Living: Tenant KYC Submitted*\n\n"
+                    f"👤 *Resident:* {name}\n"
+                    f"📞 *Phone:* {phone}\n"
+                    f"📍 *PG Campus:* {prop}\n"
+                    f"📄 *Document:* {id_type} ({id_num})\n"
+                    f"🏢 *Occupation:* {occ} {f'({inst})' if inst else ''}\n"
+                    f"🔗 [Review KYC in Manager Hub](https://ashro-living.onrender.com/admin#kyc)"
+                )
+                payload = urllib.parse.urlencode({
+                    "chat_id": TELEGRAM_CHAT_ID,
+                    "text": text,
+                    "parse_mode": "Markdown"
+                }).encode("utf-8")
+                req = urllib.request.Request(url, data=payload, method="POST")
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    pass
+            except Exception as e:
+                print(f"⚠️ Telegram KYC notify error: {e}")
+
+    if async_mode:
+        thread = threading.Thread(target=_worker, daemon=True)
+        thread.start()
+        return thread
+    else:
+        _worker()
+        return None

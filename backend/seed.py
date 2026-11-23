@@ -11,6 +11,7 @@ def seed_database():
 
         # Clean existing data
         cursor.execute("DELETE FROM inquiries;")
+        cursor.execute("DELETE FROM kyc_records;")
         cursor.execute("DELETE FROM notices;")
         cursor.execute("DELETE FROM meal_preferences;")
         cursor.execute("DELETE FROM meal_menu;")
@@ -193,6 +194,138 @@ def seed_database():
             INSERT INTO users (name, email, password, phone, role, kyc_status, emergency_contact, avatar_url)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """, users_data)
+
+        # Seed initial KYC Records
+        aadhaar_aarav_front = (
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+            '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
+            '<rect width="400" height="35" fill="%23302720"/>'
+            '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">GOVERNMENT OF INDIA • AADHAAR CARD</text>'
+            '<rect x="25" y="55" width="80" height="100" fill="%23E8DED1" rx="4"/>'
+            '<circle cx="65" cy="90" r="25" fill="%23B69B83"/>'
+            '<path d="M40 140 C40 115 90 115 90 140 Z" fill="%23B69B83"/>'
+            '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="%23302720">NAME: AARAV SHARMA</text>'
+            '<text x="125" y="98" font-family="sans-serif" font-size="11" fill="%23756D65">DOB: 14/08/1998 • Gender: Male</text>'
+            '<text x="125" y="125" font-family="sans-serif" font-size="14" font-weight="bold" fill="%23765B49">XXXX XXXX 8241</text>'
+            '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
+            '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Mera Aadhaar, Meri Pehchaan • Verified</text></svg>'
+        )
+
+        aadhaar_aarav_back = (
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+            '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
+            '<rect width="400" height="35" fill="%23302720"/>'
+            '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">UNIQUE IDENTIFICATION AUTHORITY OF INDIA</text>'
+            '<text x="25" y="70" font-family="sans-serif" font-size="11" font-weight="bold" fill="%23302720">Permanent Address:</text>'
+            '<text x="25" y="92" font-family="sans-serif" font-size="11" fill="%23756D65">B-402, Shivalik Residency, 150 Feet Ring Road</text>'
+            '<text x="25" y="112" font-family="sans-serif" font-size="11" fill="%23756D65">Rajkot, Gujarat - 360005</text>'
+            '<rect x="25" y="145" width="350" height="40" fill="%23E8DED1" rx="4"/>'
+            '<text x="40" y="170" font-family="monospace" font-size="11" fill="%23302720">||| | ||||| || |||||| | |||| ||| ||||</text>'
+            '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
+            '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Official Proof of Residence</text></svg>'
+        )
+
+        work_id_aarav = (
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+            '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
+            '<rect width="400" height="35" fill="%23765B49"/>'
+            '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">EMPLOYEE ID • TATA CONSULTANCY SERVICES</text>'
+            '<rect x="25" y="55" width="80" height="100" fill="%23E8DED1" rx="4"/>'
+            '<circle cx="65" cy="90" r="25" fill="%23B69B83"/>'
+            '<path d="M40 140 C40 115 90 115 90 140 Z" fill="%23B69B83"/>'
+            '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="%23302720">AARAV SHARMA</text>'
+            '<text x="125" y="95" font-family="sans-serif" font-size="11" fill="%23756D65">Designation: Systems Engineer</text>'
+            '<text x="125" y="115" font-family="sans-serif" font-size="11" fill="%23756D65">Emp ID: TCS-748921</text>'
+            '<text x="125" y="135" font-family="sans-serif" font-size="11" fill="%23756D65">Campus: Infocity, Gandhinagar</text>'
+            '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
+            '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Corporate Employment Verification Card</text></svg>'
+        )
+
+        aadhaar_kavya_front = (
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+            '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
+            '<rect width="400" height="35" fill="%23302720"/>'
+            '<text x="20" y="23" fill="%23FFFFFF" font-family="sans-serif" font-size="12" font-weight="bold">GOVERNMENT OF INDIA • AADHAAR CARD</text>'
+            '<rect x="25" y="55" width="80" height="100" fill="%23E8DED1" rx="4"/>'
+            '<circle cx="65" cy="90" r="25" fill="%23B69B83"/>'
+            '<path d="M40 140 C40 115 90 115 90 140 Z" fill="%23B69B83"/>'
+            '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="%23302720">NAME: KAVYA PATEL</text>'
+            '<text x="125" y="98" font-family="sans-serif" font-size="11" fill="%23756D65">DOB: 22/11/2002 • Gender: Female</text>'
+            '<text x="125" y="125" font-family="sans-serif" font-size="14" font-weight="bold" fill="%23765B49">XXXX XXXX 5192</text>'
+            '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
+            '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Mera Aadhaar, Meri Pehchaan • Pending Review</text></svg>'
+        )
+
+        college_id_kavya = (
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">'
+            '<rect width="400" height="250" fill="%23FFFFFF" rx="8" stroke="%23DED5C9" stroke-width="2"/>'
+            '<rect width="400" height="35" fill="%23B69B83"/>'
+            '<text x="20" y="23" fill="%23302720" font-family="sans-serif" font-size="12" font-weight="bold">STUDENT ID • NIRMA UNIVERSITY</text>'
+            '<rect x="25" y="55" width="80" height="100" fill="%23E8DED1" rx="4"/>'
+            '<circle cx="65" cy="90" r="25" fill="%23B69B83"/>'
+            '<path d="M40 140 C40 115 90 115 90 140 Z" fill="%23B69B83"/>'
+            '<text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="%23302720">KAVYA PATEL</text>'
+            '<text x="125" y="95" font-family="sans-serif" font-size="11" fill="%23756D65">Program: B.Tech Computer Engineering</text>'
+            '<text x="125" y="115" font-family="sans-serif" font-size="11" fill="%23756D65">Roll No: 2024-BTECH-CE-082</text>'
+            '<text x="125" y="135" font-family="sans-serif" font-size="11" fill="%23756D65">Campus: SG Highway, Ahmedabad</text>'
+            '<rect x="0" y="220" width="400" height="30" fill="%23F7F3ED"/>'
+            '<text x="20" y="238" font-family="sans-serif" font-size="10" fill="%23756D65">Valid Academic ID 2024-2028</text></svg>'
+        )
+
+        kyc_data = [
+            (
+                1, # Aarav Sharma
+                "Aadhaar Card",
+                "XXXX XXXX 8241",
+                aadhaar_aarav_front,
+                aadhaar_aarav_back,
+                "Working Professional",
+                "Tata Consultancy Services (TCS), Gandhinagar",
+                work_id_aarav,
+                "B-402, Shivalik Residency, 150 Feet Ring Road",
+                "Rajkot",
+                "Gujarat",
+                "360005",
+                "Rajesh Sharma",
+                "9876543210",
+                "Father",
+                "Verified",
+                None,
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ),
+            (
+                3, # Kavya Patel
+                "Aadhaar Card",
+                "XXXX XXXX 5192",
+                aadhaar_kavya_front,
+                aadhaar_aarav_back,
+                "Student",
+                "Nirma University, Ahmedabad",
+                college_id_kavya,
+                "A-12, Nilkanth Society, Near Bus Station",
+                "Surat",
+                "Gujarat",
+                "395009",
+                "Hitesh Patel",
+                "9876543210",
+                "Father",
+                "Under Review",
+                None,
+                None
+            )
+        ]
+
+        cursor.executemany("""
+            INSERT INTO kyc_records (
+                user_id, id_type, id_number, id_front_image, id_back_image,
+                occupation_type, institution_name, work_id_image,
+                permanent_address, city, state, pincode,
+                emergency_name, emergency_phone, emergency_relation,
+                status, rejection_reason, verified_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """, kyc_data)
+
+        cursor.execute("UPDATE users SET kyc_status = 'Under Review' WHERE id = 3;")
 
         # 3. Rooms & Suites (Simple, practical names for students and professionals)
         rooms_data = [

@@ -126,7 +126,54 @@ class TestAshroLivingCore(unittest.TestCase):
         self.assertIn("total_properties", stats)
         self.assertIn("occupancy_rate", stats)
         self.assertIn("revenue_collected", stats)
+        self.assertIn("pending_kyc", stats)
         self.assertGreater(stats['total_rooms'], 0)
+
+    def test_kyc_flow(self):
+        # 1. Check existing verified user (Aarav)
+        aarav_kyc = models.get_user_kyc(1)
+        self.assertIsNotNone(aarav_kyc)
+        self.assertEqual(aarav_kyc['status'], "Verified")
+        self.assertEqual(aarav_kyc['id_type'], "Aadhaar Card")
+
+        # 2. Check pending review user (Kavya)
+        kavya_kyc = models.get_user_kyc(3)
+        self.assertIsNotNone(kavya_kyc)
+        self.assertEqual(kavya_kyc['status'], "Under Review")
+
+        # 3. Save new/updated KYC
+        updated = models.save_user_kyc(3, {
+            "id_type": "Aadhaar Card",
+            "id_number": "XXXX XXXX 9999",
+            "occupation_type": "Student",
+            "institution_name": "Nirma University Engineering",
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "pincode": "382481",
+            "emergency_name": "Hitesh Patel",
+            "emergency_phone": "9876543210"
+        })
+        self.assertEqual(updated['status'], "Under Review")
+        self.assertEqual(updated['id_number'], "XXXX XXXX 9999")
+
+        # 4. Admin fetch all records
+        all_kyc = models.get_all_kyc_records()
+        self.assertGreaterEqual(len(all_kyc), 2)
+
+        # 5. Admin approve KYC
+        kavya_record = [k for k in all_kyc if k['user_id'] == 3][0]
+        approved = models.update_kyc_status(kavya_record['id'], "Verified")
+        self.assertEqual(approved['status'], "Verified")
+        self.assertIsNotNone(approved['verified_at'])
+
+        # 6. Admin test rejection with reason
+        rejected = models.update_kyc_status(kavya_record['id'], "Rejected", "Aadhaar back image blurry")
+        self.assertEqual(rejected['status'], "Rejected")
+        self.assertEqual(rejected['rejection_reason'], "Aadhaar back image blurry")
+
+        # 7. Test notification dispatch
+        import backend.notifications as notifications
+        notifications.notify_admin_kyc(approved, async_mode=False)
 
 if __name__ == '__main__':
     unittest.main()

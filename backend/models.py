@@ -467,6 +467,9 @@ def get_admin_dashboard_stats():
         cursor.execute("SELECT COUNT(*) as upcoming_visits FROM visits WHERE status = 'Scheduled';")
         upcoming_visits = cursor.fetchone()['upcoming_visits']
 
+        cursor.execute("SELECT COUNT(*) as pending_kyc FROM kyc_records WHERE status = 'Under Review';")
+        pending_kyc = cursor.fetchone()['pending_kyc']
+
         cursor.execute("SELECT * FROM bookings ORDER BY created_at DESC LIMIT 5;")
         recent_bookings = rows_to_list(cursor.fetchall())
 
@@ -482,5 +485,161 @@ def get_admin_dashboard_stats():
             "pending_rent": pending_rent,
             "open_tickets": open_tickets,
             "upcoming_visits": upcoming_visits,
+            "pending_kyc": pending_kyc,
             "recent_bookings": recent_bookings
         }
+
+# ================= KYC Records =================
+def get_user_kyc(user_id):
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT k.*, u.name as user_name, u.email as user_email, u.phone as user_phone, u.avatar_url,
+                   b.booking_reference, r.name as room_name, p.name as property_name
+            FROM users u
+            LEFT JOIN kyc_records k ON u.id = k.user_id
+            LEFT JOIN bookings b ON u.id = b.user_id AND b.status = 'Confirmed'
+            LEFT JOIN rooms r ON b.room_id = r.id
+            LEFT JOIN properties p ON b.property_id = p.id
+            WHERE u.id = ?;
+        """, (user_id,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        d = dict_from_row(row)
+        if not d.get("id"):
+            return {
+                "user_id": user_id,
+                "user_name": d.get("user_name"),
+                "user_email": d.get("user_email"),
+                "user_phone": d.get("user_phone"),
+                "room_name": d.get("room_name") or "Allocated Suite",
+                "property_name": d.get("property_name") or "Ashro Living Amdavad",
+                "status": "Pending Submission",
+                "id_type": "Aadhaar Card",
+                "id_number": "",
+                "occupation_type": "Working Professional",
+                "institution_name": "",
+                "permanent_address": "",
+                "city": "",
+                "state": "Gujarat",
+                "pincode": "",
+                "emergency_name": "",
+                "emergency_phone": "",
+                "emergency_relation": "Parent",
+                "id_front_image": None,
+                "id_back_image": None,
+                "work_id_image": None,
+                "rejection_reason": None,
+                "submitted_at": None,
+                "verified_at": None
+            }
+        return d
+
+def save_user_kyc(user_id, data):
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO kyc_records (
+                user_id, id_type, id_number, id_front_image, id_back_image,
+                occupation_type, institution_name, work_id_image,
+                permanent_address, city, state, pincode,
+                emergency_name, emergency_phone, emergency_relation,
+                status, rejection_reason, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Under Review', NULL, CURRENT_TIMESTAMP)
+            ON CONFLICT(user_id) DO UPDATE SET
+                id_type = excluded.id_type,
+                id_number = excluded.id_number,
+                id_front_image = COALESCE(excluded.id_front_image, kyc_records.id_front_image),
+                id_back_image = COALESCE(excluded.id_back_image, kyc_records.id_back_image),
+                occupation_type = excluded.occupation_type,
+                institution_name = excluded.institution_name,
+                work_id_image = COALESCE(excluded.work_id_image, kyc_records.work_id_image),
+                permanent_address = excluded.permanent_address,
+                city = excluded.city,
+                state = excluded.state,
+                pincode = excluded.pincode,
+                emergency_name = excluded.emergency_name,
+                emergency_phone = excluded.emergency_phone,
+                emergency_relation = excluded.emergency_relation,
+                status = 'Under Review',
+                rejection_reason = NULL,
+                updated_at = CURRENT_TIMESTAMP;
+        """, (
+            user_id,
+            data.get('id_type', 'Aadhaar Card'),
+            data.get('id_number', ''),
+            data.get('id_front_image'),
+            data.get('id_back_image'),
+            data.get('occupation_type', 'Working Professional'),
+            data.get('institution_name', ''),
+            data.get('work_id_image'),
+            data.get('permanent_address', ''),
+            data.get('city', ''),
+            data.get('state', 'Gujarat'),
+            data.get('pincode', ''),
+            data.get('emergency_name', ''),
+            data.get('emergency_phone', ''),
+            data.get('emergency_relation', 'Parent')
+        ))
+        cursor.execute("UPDATE users SET kyc_status = 'Under Review' WHERE id = ?;", (user_id,))
+    return get_user_kyc(user_id)
+
+def get_all_kyc_records(status=None):
+    with get_db() as conn:
+        cursor = conn.cursor()
+        query = """
+            SELECT k.*, u.name as user_name, u.email as user_email, u.phone as user_phone, u.avatar_url,
+                   r.name as room_name, p.name as property_name, b.booking_reference
+            FROM kyc_records k
+            JOIN users u ON k.user_id = u.id
+            LEFT JOIN bookings b ON u.id = b.user_id AND b.status = 'Confirmed'
+            LEFT JOIN rooms r ON b.room_id = r.id
+            LEFT JOIN properties p ON b.property_id = p.id
+        """
+        params = []
+        if status and status != 'all':
+            query += " WHERE k.status = ?"
+            params.append(status)
+        query += " ORDER BY k.updated_at DESC;"
+        cursor.execute(query, params)
+        return rows_to_list(cursor.fetchall())
+
+def update_kyc_status(kyc_id, status, rejection_reason=None):
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM kyc_records WHERE id = ?;", (kyc_id,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        user_id = row['user_id']
+
+        if status == 'Verified':
+            cursor.execute("""
+                UPDATE kyc_records
+                SET status = 'Verified', rejection_reason = NULL, verified_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?;
+            """, (kyc_id,))
+            cursor.execute("UPDATE users SET kyc_status = 'Verified' WHERE id = ?;", (user_id,))
+        elif status == 'Rejected':
+            cursor.execute("""
+                UPDATE kyc_records
+                SET status = 'Rejected', rejection_reason = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?;
+            """, (rejection_reason or 'Document details unclear. Please re-upload.', kyc_id))
+            cursor.execute("UPDATE users SET kyc_status = 'Rejected' WHERE id = ?;", (user_id,))
+        else:
+            cursor.execute("UPDATE kyc_records SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;", (status, kyc_id))
+            cursor.execute("UPDATE users SET kyc_status = ? WHERE id = ?;", (status, user_id))
+
+        cursor.execute("""
+            SELECT k.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
+                   r.name as room_name, p.name as property_name
+            FROM kyc_records k
+            JOIN users u ON k.user_id = u.id
+            LEFT JOIN bookings b ON u.id = b.user_id
+            LEFT JOIN rooms r ON b.room_id = r.id
+            LEFT JOIN properties p ON b.property_id = p.id
+            WHERE k.id = ?;
+        """, (kyc_id,))
+        return dict_from_row(cursor.fetchone())

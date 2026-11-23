@@ -48,7 +48,7 @@
                     <p>Ashro Living &bull; Vastral PG (Amdavad) &bull; <strong style="color: var(--bg-primary);">Room 101, Bed A</strong></p>
                     <div class="resident-pills">
                         <span class="resident-pill active">Active Stay</span>
-                        <span class="resident-pill tag">ID Verified</span>
+                        <span class="resident-pill tag" id="resKycPill">Checking KYC...</span>
                         <span class="resident-pill tag">Resident ID: ASHRO-2026-101A</span>
                     </div>
                 </div>
@@ -67,6 +67,7 @@
             <div class="resident-tab" data-tab="tickets" onclick="switchTab('tickets', this)">Complaints &amp; Help</div>
             <div class="resident-tab" data-tab="meals" onclick="switchTab('meals', this)">Weekly Food Menu</div>
             <div class="resident-tab" data-tab="notices" onclick="switchTab('notices', this)">Notice Board</div>
+            <div class="resident-tab" data-tab="kyc" onclick="switchTab('kyc', this)">Digital KYC &amp; ID Proof</div>
         </div>
 
         <!-- Container -->
@@ -219,6 +220,202 @@
                 </div>
             </div>
 
+            <!-- TAB 6: Digital KYC & ID Verification -->
+            <div class="tab-pane" id="tab-kyc">
+                <div class="portal-box">
+                    <div class="portal-box-header" style="flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h3 style="font-size: 24px;">Tenant Digital KYC &amp; ID Proof</h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Government ID and occupation verification for verified PG occupancy and local police intimation.</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn-secondary" style="font-size: 11px; padding: 6px 12px;" onclick="loadSampleKycDocs()">
+                                &#128196; Load Demo ID Sample
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KYC Status Banner -->
+                    <div id="kycStatusBanner" class="kyc-status-banner pending">
+                        <div>
+                            <strong id="kycStatusTitle" style="font-size: 16px;">Loading KYC Status...</strong>
+                            <p id="kycStatusDesc" style="font-size: 13px; margin: 4px 0 0 0; opacity: 0.9;">Please verify your details below.</p>
+                        </div>
+                        <span id="kycStatusBadge" class="doc-badge-status pending">Pending</span>
+                    </div>
+
+                    <!-- Current Verified Docs Display -->
+                    <div id="kycCurrentDocsSection" style="display: none; margin-bottom: 28px;">
+                        <h4 style="font-size: 17px; margin-bottom: 12px; color: var(--text-heading);">Current Documents on Record</h4>
+                        <div class="doc-upload-grid">
+                            <div class="doc-upload-box" onclick="viewDocImage('id_front')">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--text-heading); display: block; margin-bottom: 6px;">Govt ID Card (Front)</span>
+                                <img id="viewThumbFront" class="doc-thumb-preview" alt="ID Front Preview">
+                                <span style="font-size: 11px; color: var(--accent-cocoa); font-weight: 600;">Click to view full size &rarr;</span>
+                            </div>
+                            <div class="doc-upload-box" onclick="viewDocImage('id_back')">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--text-heading); display: block; margin-bottom: 6px;">Govt ID / Address (Back)</span>
+                                <img id="viewThumbBack" class="doc-thumb-preview" alt="ID Back Preview">
+                                <span style="font-size: 11px; color: var(--accent-cocoa); font-weight: 600;">Click to view full size &rarr;</span>
+                            </div>
+                            <div class="doc-upload-box" onclick="viewDocImage('work_id')">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--text-heading); display: block; margin-bottom: 6px;">Work / Student ID Proof</span>
+                                <img id="viewThumbWork" class="doc-thumb-preview" alt="Work ID Preview">
+                                <span style="font-size: 11px; color: var(--accent-cocoa); font-weight: 600;">Click to view full size &rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KYC Upload / Update Form -->
+                    <form id="residentKycForm" onsubmit="handleKycFormSubmit(event)">
+                        <!-- Section 1: Govt Identity Proof -->
+                        <div style="border-top: 1px solid var(--border-subtle); padding-top: 20px; margin-top: 10px;">
+                            <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-heading);">1. Government Identity Document</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Accepted: Aadhaar Card, Passport, Voter ID, PAN Card, Driving License.</p>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label>Document Type *</label>
+                                    <select id="kycIdType" required>
+                                        <option value="Aadhaar Card">Aadhaar Card (UIDAI)</option>
+                                        <option value="Passport">Indian Passport</option>
+                                        <option value="PAN Card">PAN Card (Income Tax Dept)</option>
+                                        <option value="Voter ID">Voter ID (Election Commission)</option>
+                                        <option value="Driving License">Driving License</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Document / Aadhaar Number *</label>
+                                    <input type="text" id="kycIdNumber" required placeholder="e.g. 5421 8901 2345">
+                                </div>
+                            </div>
+
+                            <div class="doc-upload-grid">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: var(--text-heading);">Front Photo of ID Card *</label>
+                                    <div class="doc-upload-box" style="margin-top: 6px;" onclick="document.getElementById('inputFrontDoc').click()">
+                                        <input type="file" id="inputFrontDoc" accept="image/*,.pdf" style="display: none;" onchange="handleDocFileChange(event, 'id_front')">
+                                        <img id="previewFront" class="doc-thumb-preview" style="display: none;" alt="Front Preview">
+                                        <div id="dropPromptFront">
+                                            <div style="font-size: 24px; margin-bottom: 4px;">&#128247;</div>
+                                            <div style="font-size: 13px; font-weight: 600; color: var(--text-heading);">Upload Front Side</div>
+                                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">PNG, JPG, or PDF up to 5MB</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 700; color: var(--text-heading);">Back Photo / Address Side *</label>
+                                    <div class="doc-upload-box" style="margin-top: 6px;" onclick="document.getElementById('inputBackDoc').click()">
+                                        <input type="file" id="inputBackDoc" accept="image/*,.pdf" style="display: none;" onchange="handleDocFileChange(event, 'id_back')">
+                                        <img id="previewBack" class="doc-thumb-preview" style="display: none;" alt="Back Preview">
+                                        <div id="dropPromptBack">
+                                            <div style="font-size: 24px; margin-bottom: 4px;">&#128196;</div>
+                                            <div style="font-size: 13px; font-weight: 600; color: var(--text-heading);">Upload Back Side</div>
+                                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">With permanent address</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Occupation Proof -->
+                        <div style="border-top: 1px solid var(--border-subtle); padding-top: 20px; margin-top: 20px;">
+                            <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-heading);">2. Occupation / College Verification</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Verify that you are an active employee, student, or professional.</p>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label>Occupation Type *</label>
+                                    <select id="kycOccupationType" required>
+                                        <option value="Working Professional">Working Professional</option>
+                                        <option value="Student">Student (College / University)</option>
+                                        <option value="Business / Self-Employed">Business / Self-Employed</option>
+                                        <option value="Intern">Intern / Trainee</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Company / College / Firm Name *</label>
+                                    <input type="text" id="kycInstitutionName" required placeholder="e.g. TCS Gandhinagar or Nirma University">
+                                </div>
+                            </div>
+
+                            <div style="max-width: 320px; margin-top: 8px;">
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-heading);">Employee ID / College ID / Offer Letter</label>
+                                <div class="doc-upload-box" style="margin-top: 6px;" onclick="document.getElementById('inputWorkDoc').click()">
+                                    <input type="file" id="inputWorkDoc" accept="image/*,.pdf" style="display: none;" onchange="handleDocFileChange(event, 'work_id')">
+                                    <img id="previewWork" class="doc-thumb-preview" style="display: none;" alt="Work ID Preview">
+                                    <div id="dropPromptWork">
+                                        <div style="font-size: 24px; margin-bottom: 4px;">&#127891;</div>
+                                        <div style="font-size: 13px; font-weight: 600; color: var(--text-heading);">Upload Work / Student Proof</div>
+                                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">ID card or letterhead</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Permanent Address -->
+                        <div style="border-top: 1px solid var(--border-subtle); padding-top: 20px; margin-top: 20px;">
+                            <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-heading);">3. Permanent Home Address</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Your hometown or family residence address as printed on your ID.</p>
+
+                            <div class="form-group">
+                                <label>House No., Society / Apartment, Street *</label>
+                                <input type="text" id="kycAddress" required placeholder="e.g. B-402, Shivalik Residency, 150 Feet Ring Road">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label>City / Town *</label>
+                                    <input type="text" id="kycCity" required placeholder="e.g. Rajkot / Surat / Vadodara">
+                                </div>
+                                <div class="form-group">
+                                    <label>State *</label>
+                                    <input type="text" id="kycState" required value="Gujarat">
+                                </div>
+                                <div class="form-group">
+                                    <label>Pincode *</label>
+                                    <input type="text" id="kycPincode" required placeholder="360005">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Emergency / Guardian Contact -->
+                        <div style="border-top: 1px solid var(--border-subtle); padding-top: 20px; margin-top: 20px;">
+                            <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-heading);">4. Emergency Contact / Guardian Details</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Required by local authorities and for emergency medical concierge.</p>
+
+                            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label>Guardian / Parent Name *</label>
+                                    <input type="text" id="kycEmergencyName" required placeholder="e.g. Rajesh Sharma">
+                                </div>
+                                <div class="form-group">
+                                    <label>Guardian Mobile Number *</label>
+                                    <input type="tel" id="kycEmergencyPhone" required placeholder="9876543210">
+                                </div>
+                                <div class="form-group">
+                                    <label>Relationship *</label>
+                                    <select id="kycEmergencyRelation">
+                                        <option value="Father">Father</option>
+                                        <option value="Mother">Mother</option>
+                                        <option value="Brother / Sister">Brother / Sister</option>
+                                        <option value="Guardian">Local Guardian / Relative</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 28px; display: flex; gap: 14px; align-items: center;">
+                            <button type="submit" id="btnSubmitKyc" class="btn-primary" style="padding: 12px 28px; font-size: 14px;">
+                                Submit Documents for Verification &rarr;
+                            </button>
+                            <span id="kycSaveNotice" style="font-size: 12px; color: var(--text-muted);">Instant review by Property Manager</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -305,6 +502,18 @@
                 </div>
                 <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Sign In &rarr;</button>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Document Viewer Lightbox -->
+    <div class="modal-overlay" id="docViewerModal">
+        <div class="modal-card" style="max-width: 600px; text-align: center;">
+            <button class="modal-close" onclick="closeModal('docViewerModal')">&times;</button>
+            <h3 id="docViewerTitle" style="font-size: 20px; margin-bottom: 14px;">Document Image</h3>
+            <div style="background: #F7F3ED; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px;">
+                <img id="docViewerImg" src="" alt="Document Full View" style="max-width: 100%; max-height: 420px; object-fit: contain; border-radius: 4px;">
+            </div>
+            <button class="btn-secondary" onclick="closeModal('docViewerModal')">Close Preview</button>
         </div>
     </div>
 

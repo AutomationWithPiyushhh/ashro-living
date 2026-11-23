@@ -197,10 +197,25 @@ class AshroLivingHandler(BaseHTTPRequestHandler):
             JSONResponse.send(self, {"data": prefs})
             return
 
+        if path == "/api/resident/kyc":
+            user_id = params.get("user_id")
+            if not user_id:
+                JSONResponse.error(self, "Missing user_id", 400)
+                return
+            kyc = models.get_user_kyc(int(user_id))
+            JSONResponse.send(self, {"data": kyc})
+            return
+
         # Admin Portal
         if path == "/api/admin/stats":
             stats = models.get_admin_dashboard_stats()
             JSONResponse.send(self, {"data": stats})
+            return
+
+        if path == "/api/admin/kyc":
+            status = params.get("status")
+            records = models.get_all_kyc_records(status=status)
+            JSONResponse.send(self, {"data": records})
             return
 
         if path == "/api/admin/visits":
@@ -325,6 +340,19 @@ class AshroLivingHandler(BaseHTTPRequestHandler):
             JSONResponse.send(self, {"data": pref, "message": "Meal preference updated"}, 200)
             return
 
+        if path == "/api/resident/kyc":
+            user_id = body.get("user_id")
+            if not user_id:
+                JSONResponse.error(self, "Missing user_id", 400)
+                return
+            res = models.save_user_kyc(int(user_id), body)
+            try:
+                notifications.notify_admin_kyc(res)
+            except Exception as e:
+                print("KYC notification error:", e)
+            JSONResponse.send(self, {"data": res, "message": "KYC documents submitted successfully for verification"}, 200)
+            return
+
         # Admin actions
         if path == "/api/admin/rooms":
             required = ["property_id", "name", "room_type", "price_monthly", "cover_image"]
@@ -361,6 +389,19 @@ class AshroLivingHandler(BaseHTTPRequestHandler):
             notes = body.get("resolution_notes")
             res = models.update_ticket_status(t_id, status, assigned, notes)
             JSONResponse.send(self, {"data": res, "message": "Ticket updated"}, 200)
+            return
+
+        # Admin KYC update
+        kyc_match = re.match(r"^/api/admin/kyc/(\d+)$", path)
+        if kyc_match:
+            k_id = int(kyc_match.group(1))
+            status = body.get("status")
+            if not status:
+                JSONResponse.error(self, "Missing status", 400)
+                return
+            reason = body.get("rejection_reason")
+            res = models.update_kyc_status(k_id, status, reason)
+            JSONResponse.send(self, {"data": res, "message": f"Tenant KYC status updated to {status}"}, 200)
             return
 
         # Admin room update

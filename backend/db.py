@@ -190,11 +190,38 @@ CREATE TABLE IF NOT EXISTS inquiries (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS kyc_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    id_type TEXT NOT NULL DEFAULT 'Aadhaar Card',
+    id_number TEXT,
+    id_front_image TEXT,
+    id_back_image TEXT,
+    occupation_type TEXT DEFAULT 'Working Professional',
+    institution_name TEXT,
+    work_id_image TEXT,
+    permanent_address TEXT,
+    city TEXT,
+    state TEXT DEFAULT 'Gujarat',
+    pincode TEXT,
+    emergency_name TEXT,
+    emergency_phone TEXT,
+    emergency_relation TEXT DEFAULT 'Parent',
+    status TEXT DEFAULT 'Under Review',
+    rejection_reason TEXT,
+    verified_at TIMESTAMP,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_rooms_property ON rooms(property_id);
 CREATE INDEX IF NOT EXISTS idx_rooms_status ON rooms(status);
 CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_user ON tickets(user_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_user ON invoices(user_id);
+CREATE INDEX IF NOT EXISTS idx_kyc_user ON kyc_records(user_id);
+CREATE INDEX IF NOT EXISTS idx_kyc_status ON kyc_records(status);
 """
 
 def get_connection():
