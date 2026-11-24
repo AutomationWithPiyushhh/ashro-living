@@ -1,3 +1,5 @@
-# Ashro Living uses the Python 3 standard library (http.server, sqlite3, json, etc.).
-# No external pip packages are strictly required.
-# If you wish to use a production WSGI server in the future, you can add gunicorn here.
+# Ashro Living
+# Core application runs on Python 3 standard library.
+# Optional PostgreSQL driver for Supabase / Cloud Database:
+psycopg2-binary>=2.9.9
+

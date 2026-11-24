@@ -1,8 +1,9 @@
 import sqlite3
 import json
 import base64
+import os
 from contextlib import contextmanager
-from backend.config import DB_PATH, DATA_DIR
+from backend.config import DB_PATH, DATA_DIR, DATABASE_URL
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -225,7 +226,79 @@ CREATE INDEX IF NOT EXISTS idx_kyc_user ON kyc_records(user_id);
 CREATE INDEX IF NOT EXISTS idx_kyc_status ON kyc_records(status);
 """
 
+class PostgresCursorWrapper:
+    def __init__(self, pg_cursor):
+        self.cursor = pg_cursor
+        self.lastrowid = None
+
+    def execute(self, query, params=None):
+        clean_query = query.replace('?', '%s')
+        # On INSERT queries, capture inserted ID
+        if clean_query.strip().upper().startswith("INSERT INTO") and "RETURNING" not in clean_query.upper():
+            clean_query = clean_query.rstrip().rstrip(';') + " RETURNING id;"
+            self.cursor.execute(clean_query, params or ())
+            try:
+                row = self.cursor.fetchone()
+                if row:
+                    self.lastrowid = row[0] if isinstance(row, (list, tuple)) else row.get('id')
+            except Exception:
+                pass
+            return self
+
+        self.cursor.execute(clean_query, params or ())
+        return self
+
+    def executemany(self, query, params_seq):
+        clean_query = query.replace('?', '%s')
+        self.cursor.executemany(clean_query, params_seq)
+        return self
+
+    def fetchone(self):
+        row = self.cursor.fetchone()
+        return dict(row) if row else None
+
+    def fetchall(self):
+        rows = self.cursor.fetchall()
+        return [dict(r) for r in rows]
+
+    def __getattr__(self, name):
+        return getattr(self.cursor, name)
+
+class PostgresConnectionWrapper:
+    def __init__(self, pg_conn):
+        self.conn = pg_conn
+
+    def cursor(self):
+        import psycopg2.extras
+        return PostgresCursorWrapper(self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor))
+
+    def commit(self):
+        self.conn.commit()
+
+    def rollback(self):
+        self.conn.rollback()
+
+    def close(self):
+        self.conn.close()
+
+    def executescript(self, script):
+        with self.conn.cursor() as cur:
+            cur.execute(script)
+        self.conn.commit()
+
 def get_connection():
+    if DATABASE_URL:
+        try:
+            import psycopg2
+            normalized_url = DATABASE_URL
+            if normalized_url.startswith("postgres://"):
+                normalized_url = "postgresql://" + normalized_url[len("postgres://"):]
+            conn = psycopg2.connect(normalized_url)
+            return PostgresConnectionWrapper(conn)
+        except Exception as e:
+            print("⚠️ PostgreSQL (Supabase) connection notice:", e)
+            print("   Using local SQLite fallback.")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")

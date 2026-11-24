@@ -31,17 +31,17 @@ def seed_database():
 
         # 1. Properties (Amdavad active + upcoming)
         properties_data = [
-            # Active Branches in Amdavad
+            # Active Operating Branches in Amdavad (Bhagwati PG Group)
             (
-                "Ashro Living — Vastral",
+                "Ashro Living — Bhagwati PG Group 02 (Vastral)",
                 "vastral",
                 "Amdavad",
                 "Vastral",
-                "Near Nirant Cross Road, SP Ring Road, Vastral, Amdavad, Gujarat 382418",
+                "Near Nirant Cross Road & Rajendra Park Road, SP Ring Road, Vastral, Amdavad, Gujarat 382418",
                 "Unisex / Separate Floors",
                 32,
                 "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80",
-                "Located near Nirant Cross Road and SP Ring Road. Perfect for students and working professionals. Direct transport to Odhav, Nikol, and ring road offices.",
+                "Bhagwati PG Group 02 located near Nirant Cross Road and SP Ring Road. Perfect for students and working professionals. Direct transport to Odhav GIDC, Rajendra Park Rd, Nikol, and ring road offices.",
                 json.dumps([
                     "Free High-Speed Wi-Fi",
                     "3 Times Homemade Meals Included",
@@ -55,15 +55,15 @@ def seed_database():
                 "Active"
             ),
             (
-                "Ashro Living — Naroda",
+                "Ashro Living — Bhagwati PG Group 03 (Naroda)",
                 "naroda",
                 "Amdavad",
                 "Naroda",
-                "Near Galaxy Cinema, Naroda-Dehgam Road, Naroda, Amdavad, Gujarat 382330",
+                "Near Galaxy Cinema & Naroda Gam BRTS, Naroda-Dehgam Road, Kathwada, Naroda, Amdavad, Gujarat 382330",
                 "Unisex / Separate Floors",
                 28,
                 "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80",
-                "Located right on Naroda-Dehgam road near Galaxy Cinema. Close to Naroda GIDC, hospitals, and markets. Easy bus and auto availability.",
+                "Bhagwati PG Group 03 located right on Naroda-Dehgam road near Galaxy Cinema and Naroda Gam BRTS. Close to Naroda GIDC, Krishna Nagar GSRTC Bus Stand, and Kathwada Rd.",
                 json.dumps([
                     "Free High-Speed Wi-Fi",
                     "Daily Fresh Breakfast, Lunch & Dinner",
@@ -75,15 +75,15 @@ def seed_database():
                 "Active"
             ),
             (
-                "Ashro Living — Rabari Colony Metro",
+                "Ashro Living — Bhagwati PG Group 01 (Rabari Colony Metro)",
                 "rabari-colony",
                 "Amdavad",
                 "Rabari Colony",
-                "Opposite Metro Pillar 118, Rabari Colony Metro Station, Amraiwadi, Amdavad, Gujarat 380026",
+                "Opposite Metro Pillar 118, Rabari Colony Metro Station, Amraiwadi, Khokhra, Amdavad, Gujarat 380026",
                 "Unisex / Separate Floors",
                 24,
                 "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1920&q=80",
-                "Just 2 minutes walk from Rabari Colony Metro Station. Direct metro line to Kalupur Railway Station, Gandhinagar, and West Ahmedabad.",
+                "Bhagwati PG Group 01 located just 2 minutes walk from Rabari Colony Metro Station. Direct metro line to Kalupur Railway Station, Gandhinagar, Khokhra, Soni ni Chali, and West Ahmedabad.",
                 json.dumps([
                     "2 Minutes Walk to Metro Station",
                     "Free Fast Wi-Fi",

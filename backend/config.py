@@ -8,3 +8,5 @@ DB_PATH = Path(os.environ.get("DB_PATH", DATA_DIR / "ashroliving.db"))
 
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", 8000))
+DATABASE_URL = os.environ.get("DATABASE_URL") or os.environ.get("SUPABASE_DB_URL")
+

@@ -698,3 +698,55 @@ function closeModal(modalId) {
     const m = document.getElementById(modalId);
     if (m) m.classList.remove('active');
 }
+
+// Interactive Google Map Explorer for Bhagwati PG Group 01, 02, 03
+const mapBranchData = {
+    group01: {
+        title: "Bhagwati PG Group 01 — Rabari Colony Metro",
+        address: "Opposite Metro Pillar 118, Rabari Colony Metro Station, Amraiwadi, Khokhra (380026)",
+        embedUrl: "https://maps.google.com/maps?q=Rabari+Colony+Metro+Station+Ahmedabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
+        mapLink: "https://www.google.com/maps/search/?api=1&query=Bhagwati+PG+Group+01+Rabari+Colony+Ahmedabad"
+    },
+    group02: {
+        title: "Bhagwati PG Group 02 — Vastral Branch",
+        address: "Near Nirant Cross Road & Rajendra Park Road, SP Ring Road, Vastral (382418)",
+        embedUrl: "https://maps.google.com/maps?q=Nirant+Cross+Road+Vastral+Ahmedabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
+        mapLink: "https://www.google.com/maps/search/?api=1&query=Bhagwati+PG+Group+02+Vastral+Ahmedabad"
+    },
+    group03: {
+        title: "Bhagwati PG Group 03 — Naroda Branch",
+        address: "Near Galaxy Cinema & Naroda Gam BRTS, Naroda-Dehgam Road, Kathwada, Naroda (382330)",
+        embedUrl: "https://maps.google.com/maps?q=Galaxy+Cinema+Naroda+Ahmedabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
+        mapLink: "https://www.google.com/maps/search/?api=1&query=Bhagwati+PG+Group+03+Naroda+Ahmedabad"
+    }
+};
+
+function openExploreMapModal(defaultGroup = 'group01') {
+    switchMapBranch(defaultGroup);
+    const modal = document.getElementById('exploreMapModal');
+    if (modal) modal.classList.add('active');
+}
+
+function switchMapBranch(groupKey) {
+    const data = mapBranchData[groupKey] || mapBranchData.group01;
+    
+    // Update active tab button
+    ['group01', 'group02', 'group03'].forEach(k => {
+        const tabId = k === 'group01' ? 'mapTab01' : (k === 'group02' ? 'mapTab02' : 'mapTab03');
+        const tab = document.getElementById(tabId);
+        if (tab) {
+            if (k === groupKey) tab.classList.add('active');
+            else tab.classList.remove('active');
+        }
+    });
+
+    const iframe = document.getElementById('exploreMapIframe');
+    const titleEl = document.getElementById('exploreBranchTitle');
+    const addrEl = document.getElementById('exploreBranchAddress');
+    const linkEl = document.getElementById('exploreBranchMapLink');
+
+    if (iframe) iframe.src = data.embedUrl;
+    if (titleEl) titleEl.textContent = data.title;
+    if (addrEl) addrEl.textContent = data.address;
+    if (linkEl) linkEl.href = data.mapLink;
+}
